@@ -1,0 +1,22 @@
+# Archivos y directorios generados por Django
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Directorio donde se almacenan los archivos estáticos en producción
+staticfiles/
+
+# Entorno virtual (ajusta la ruta si no estás usando virtualenv)
+venv/
+.env
+
+# Archivos de configuración de sistema
+*.swp
+*.swo
+.DS_Store
+
+# Archivos generados por IDE o editores de código
+.idea/
+.vscode/
+git
