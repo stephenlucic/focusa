@@ -1,6 +1,6 @@
 # *FOCUSA*
 
-![alt text](focusa.JPG)
+![alt text](focusa_logo.JPG)
 
 Esta es un aplicación para organizar tareas, etc 
 
