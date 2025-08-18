@@ -1,6 +1,4 @@
-# 🦭 Focusa
-
-![Focusa Logo](focusa_logo.jpeg)
+![Focusa Logo](FOCUSA.png)
 
 **Focusa** es una aplicación y sitio web pensada para cualquier persona que quiera **gestionar mejor su tiempo y sus tareas**.  
 Con una interfaz simple e intuitiva, busca ayudarte a cumplir plazos, organizar prioridades y visualizar tu progreso de forma clara.
