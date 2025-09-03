@@ -13,6 +13,9 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  DOCS_DIR: Focusa/docs   # <<--- carpeta donde vive tu Astro
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,20 +28,20 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: docs/package-lock.json
+          cache-dependency-path: ${{ env.DOCS_DIR }}/package-lock.json
 
       - name: Install deps (docs)
-        working-directory: docs
+        working-directory: ${{ env.DOCS_DIR }}
         run: npm ci
 
       - name: Build (docs)
-        working-directory: docs
+        working-directory: ${{ env.DOCS_DIR }}
         run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/dist
+          path: ${{ env.DOCS_DIR }}/dist
 
   deploy:
     needs: build
