@@ -66,7 +66,9 @@
 /* Colores */
 .bg-focusa { background-color: #576092 !important; }
 /* opcional: línea inferior sutil */
-.navbar.bg-focusa { border-bottom: 1px solid #4b5580; }
+.navbar.bg-focusa {
+    z-index: 1040 !important; /* Mayor que el sidebar (1030) */
+ }
 
 /* Header: campana y perfil */
 .btn-notify{ position: relative; line-height: 1; }
@@ -100,4 +102,16 @@
   min-height: calc(100vh - 56px);
   padding: 1.5rem;
   transition: margin-left .2s ease;
+}
+
+/* Footer mejorado */
+footer {
+  backdrop-filter: blur(10px);
+  margin-top: auto;
+  z-index: 1040; /* Menor que el sidebar (1030) */
+  position: relative;
+}
+
+footer .text-white {
+  font-weight: 600;
 }
