@@ -1,0 +1,85 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Focusa | Dashboard{% endblock %}</title>
+
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{% static 'css/custom-css.css' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-light">
+  {% include "includes/header.html" %}
+
+<div style="padding-top: 56px;">
+  {% include "includes/sidebar.html" %}
+  <main id="content" class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+  {% include "includes/footer.html" %}
+
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  <script>
+    (function () {
+      const sidebar = document.getElementById('sidebarMenu');
+      const toggle = document.getElementById('sidebarToggle');
+      const mainContent = document.getElementById('content');
+      if (!sidebar || !mainContent) return;
+
+      const isDesktop = () => window.innerWidth >= 992;
+      let leaveTimer = null;
+
+      const expand = () => { 
+        if (isDesktop()) {
+          sidebar.classList.remove('collapsed');
+          mainContent.style.marginLeft = 'var(--sb-width)';
+        }
+      };
+      const collapse = () => { 
+        if (isDesktop()) {
+          sidebar.classList.add('collapsed');
+          mainContent.style.marginLeft = 'var(--sb-width-collapsed)';
+        }
+      };
+
+      // Estado inicial
+      if (isDesktop()) {
+        sidebar.classList.add('collapsed');
+        mainContent.style.marginLeft = 'var(--sb-width-collapsed)';
+      }
+
+      sidebar.addEventListener('mouseenter', () => { clearTimeout(leaveTimer); expand(); });
+      sidebar.addEventListener('mouseleave', () => { clearTimeout(leaveTimer); leaveTimer = setTimeout(collapse, 200); });
+      sidebar.addEventListener('focusin', expand);
+      sidebar.addEventListener('focusout', () => { leaveTimer = setTimeout(collapse, 200); });
+
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          if (!isDesktop()) sidebar.classList.toggle('show');
+        });
+      }
+
+      window.addEventListener('resize', () => {
+        clearTimeout(leaveTimer);
+        if (isDesktop()) { 
+          sidebar.classList.remove('show');
+          collapse();
+        } else {
+          sidebar.classList.remove('collapsed');
+          mainContent.style.marginLeft = '0';
+        }
+      });
+
+      const tts = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tts.map(el => new bootstrap.Tooltip(el));
+    })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

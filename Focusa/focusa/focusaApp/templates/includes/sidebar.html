@@ -1,0 +1,47 @@
+<nav id="sidebarMenu" class="sidebar bg-focusa text-white">
+  <div class="sidebar-inner d-flex flex-column h-100">
+    <hr class="border-secondary my-0">
+
+    <ul class="nav nav-pills flex-column p-3 gap-2">
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}"
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Home">
+          <i class="bi bi-house-door"></i>
+          <span class="label">Home</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard">
+          <i class="bi bi-speedometer2"></i>
+          <span class="label">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" href="#"
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Orders">
+          <i class="bi bi-table"></i>
+          <span class="label">Orders</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" href="#"
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Products">
+          <i class="bi bi-grid"></i>
+          <span class="label">Products</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2" href="#"
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Customers">
+          <i class="bi bi-person-circle"></i>
+          <span class="label">Customers</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="mt-auto px-3 py-3 small text-white-50">
+      <span class="label">© {% now "Y" %} Focusa</span>
+    </div>
+  </div>
+</nav>

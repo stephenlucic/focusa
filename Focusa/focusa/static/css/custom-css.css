@@ -1,0 +1,103 @@
+/* ...existing code... */
+
+/* Variables y layout del sidebar */
+:root{
+  --sb-width: 260px;
+  --sb-width-collapsed: 72px;
+}
+.sidebar{
+  width: var(--sb-width);
+  height: calc(100vh - 56px);        /* descuenta navbar fija */
+  position: fixed;
+  top: 56px;
+  left: 0; 
+  overflow-y: auto;
+  transition: width .2s ease, left .2s ease;
+  z-index: 1030; 
+}
+.sidebar .nav-link{
+  color: #ced4da;
+  border-radius: .5rem;
+  padding: .5rem .75rem;
+}
+.sidebar .nav-link.active,
+.sidebar .nav-link:hover{
+  color: #fff;
+  background-color: #0d6efd;
+}
+.sidebar .nav-link i{
+  font-size: 1.1rem;
+  width: 1.5rem;                      /* alineación iconos */
+  text-align: center;
+}
+.sidebar .brand-text{ white-space: nowrap; }
+.sidebar .label{ white-space: nowrap; }
+
+/* Estado colapsado (desktop) */
+.sidebar.collapsed{
+  width: var(--sb-width-collapsed);
+}
+.sidebar.collapsed .brand-text,
+.sidebar.collapsed .label{
+  display: none;                      /* oculta textos, muestra tooltips */
+}
+.sidebar.collapsed .nav-pills{
+  padding-left: .5rem;
+  padding-right: .5rem;
+}
+
+/* Móviles: sidebar como panel deslizante */
+@media (max-width: 991.98px){
+  .sidebar{
+    position: fixed;
+    left: -260px;
+    top: 56px;
+    width: var(--sb-width);
+    z-index: 1040;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+  }
+  .sidebar.show{ left: 0; }
+  
+  .main-content{
+    margin-left: 0 !important;       /* anula margen lateral en móviles */
+  }
+}
+
+/* Colores */
+.bg-focusa { background-color: #576092 !important; }
+/* opcional: línea inferior sutil */
+.navbar.bg-focusa { border-bottom: 1px solid #4b5580; }
+
+/* Header: campana y perfil */
+.btn-notify{ position: relative; line-height: 1; }
+.btn-notify .bi-bell{ font-size: 1.35rem; }
+.btn-notify .badge{
+  position: absolute; top: -6px; right: -8px;
+  min-width: 1.1rem; height: 1.1rem; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; color: #576092; border: 1px solid rgba(0,0,0,.12);
+  font-size: .65rem; font-weight: 600;
+}
+
+.btn-focusa-profile{
+  background: transparent; border: 0; padding: .25rem .5rem; border-radius: 999px;
+}
+.btn-focusa-profile:hover{ background-color: rgba(255,255,255,.08); }
+
+.profile-info .fw-semibold{ line-height: 1; }
+.profile-info small{ line-height: 1; }
+
+/* Avatar a la derecha */
+.avatar{
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,.95); color: #576092;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+}
+
+.main-content{
+  margin-left: var(--sb-width-collapsed);  /* espacio inicial para sidebar colapsado */
+  min-height: calc(100vh - 56px);
+  padding: 1.5rem;
+  transition: margin-left .2s ease;
+}
