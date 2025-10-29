@@ -1,0 +1,136 @@
+/* Kanban Board Styles */
+.kanban-container {
+  height: calc(100vh - 120px);
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.kanban-board {
+  display: flex;
+  gap: 1rem;
+  min-width: max-content;
+  height: 100%;
+}
+
+.kanban-column {
+  width: 300px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+.kanban-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  background: #fff;
+  border-radius: 8px 8px 0 0;
+}
+
+.kanban-header h5 {
+  margin: 0;
+  font-weight: 600;
+  color: #495057;
+}
+
+.task-count {
+  background: #6c757d;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  margin-left: 0.5rem;
+}
+
+.kanban-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.kanban-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.kanban-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #212529;
+  line-height: 1.3;
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.task-priority {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.priority-high { background: #dc3545; }
+.priority-medium { background: #fd7e14; }
+.priority-low { background: #28a745; }
+
+.task-assignee {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #576092;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.task-id {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Columnas con colores específicos */
+.column-todo .kanban-header { border-left: 4px solid #6c757d; }
+.column-progress .kanban-header { border-left: 4px solid #0d6efd; }
+.column-review .kanban-header { border-left: 4px solid #fd7e14; }
+.column-done .kanban-header { border-left: 4px solid #28a745; }
+
+/* Drag and drop placeholder */
+.drop-zone {
+  min-height: 100px;
+  border: 2px dashed #dee2e6;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.drop-zone.drag-over {
+  border-color: #0d6efd;
+  background: rgba(13, 110, 253, 0.05);
+}

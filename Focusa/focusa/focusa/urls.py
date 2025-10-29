@@ -5,6 +5,7 @@ from focusaApp import views as app_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('focusaApp.urls')),
+    path('kanban/', include('Kanban.urls')),
 ]
 
 handler404 = "focusaApp.views.error_404"
