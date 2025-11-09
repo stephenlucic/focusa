@@ -1,0 +1,83 @@
+/* Focusa Auth – Maqueta visual sin validaciones ni BD */
+
+:root {
+  --focusa-blue: #2C70B8;
+  --focusa-blue-600: #255f99;
+  --focusa-border: #E5E7EB;
+  --focusa-bg: #F9FAFB;
+  --focusa-white: #FFFFFF;
+  --focusa-muted: #6B7280;
+}
+
+body.auth-bg {
+  background-color: var(--focusa-bg);
+  font-family: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.focusa-card {
+  background: var(--focusa-white);
+  border: 1px solid var(--focusa-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(44, 112, 184, 0.08);
+  padding: 2rem;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.focusa-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(44, 112, 184, 0.12);
+}
+
+.focusa-title {
+  color: var(--focusa-blue);
+  font-weight: 700;
+  text-align: center;
+}
+
+.focusa-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.focusa-input {
+  border-radius: 10px;
+  border: 1px solid #D1D5DB;
+  padding: 0.6rem 0.75rem;
+}
+
+.focusa-input:focus {
+  outline: none;
+  border-color: var(--focusa-blue);
+  box-shadow: 0 0 0 0.2rem rgba(44, 112, 184, 0.15);
+}
+
+.btn-focusa {
+  background-color: var(--focusa-blue);
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem;
+  font-weight: 600;
+  color: #fff;
+}
+.btn-focusa:hover {
+  background-color: var(--focusa-blue-600);
+}
+
+.focusa-link {
+  color: var(--focusa-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+.focusa-link:hover {
+  text-decoration: underline;
+}
+
+.small-muted {
+  color: var(--focusa-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .focusa-card {
+    padding: 1.25rem;
+  }
+}

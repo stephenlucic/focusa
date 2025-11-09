@@ -1,0 +1,118 @@
+/* Oculta los números de semana en FullCalendar */
+.fc .fc-week-number,
+.fc .fc-weeknumbers {
+    display: none !important;
+}
+
+/* Fondo y bordes suaves para el calendario */
+#calendar {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Títulos y cabecera */
+.fc-toolbar-title {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    color: #2a2a2a;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.fc-header-toolbar {
+    margin-bottom: 1.5rem;
+}
+
+/* Botones redondeados estilo Bootstrap */
+.fc .fc-button, .fc .fc-button-group > .fc-button {
+    border-radius: 2rem !important;
+    background: #3b4cca !important;
+    color: #fff !important;
+    border: none !important;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    box-shadow: 0 2px 8px rgba(59,76,202,0.08);
+    transition: background 0.2s;
+    margin-right: 0.5rem;
+}
+
+.fc .fc-button:hover, .fc .fc-button:focus,
+.fc .fc-button-active {
+    background: #2a2a2a !important;
+    color: #fff !important;
+}
+
+/* Números y eventos */
+.fc-daygrid-day-number, .fc-list-day-cushion {
+    color: #3b4cca;
+    font-weight: 600;
+}
+
+.fc-daygrid-event {
+    font-size: 0.92em;
+    padding: 2px 8px;
+    border-radius: 1rem;
+    background: #fff;
+    border: 2px solid #3b4cca;
+    color: #2a2a2a !important;
+    font-weight: 600;
+    min-width: 120px;         /* ancho mínimo para todos los eventos */
+    max-width: 120px;         /* ancho máximo igual para todos */
+    text-align: center;       /* centra el texto */
+    box-shadow: 0 2px 8px rgba(59,76,202,0.08);
+    opacity: 1 !important;
+    white-space: normal;      /* permite que el texto se parta si es largo */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fc-event-title {
+    color: #2a2a2a !important;
+    font-weight: 600;
+}
+
+.fc-day-today {
+    background: #f8f9fa !important;
+}
+
+.fc-col-header-cell {
+    background: #f3f6fa;
+    color: #3b4cca;
+    font-weight: 700;
+    font-size: 1.1em;
+    border-bottom: 2px solid #eaf0ff;
+}
+
+/* Lista de eventos */
+.fc-list-event {
+    border-left: 4px solid #3b4cca;
+    background: #f8f9fa;
+    border-radius: 1rem;
+}
+
+.fc-list-event:hover {
+    background: #eaf0ff;
+}
+
+.fc-list-event-title {
+    font-weight: 600;
+    color: #2a2a2a;
+}
+
+.fc-list-event-time {
+    color: #3b4cca;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #calendar {
+        padding: 1rem 0.2rem;
+    }
+    .fc-toolbar-title {
+        font-size: 1.3rem;
+    }
+}
