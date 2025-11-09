@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     'focusaApp',
     'Kanban',
     'perfil',
+    'usuario',
+    'calendario',
 ]
 
 MIDDLEWARE = [
@@ -46,7 +48,7 @@ ROOT_URLCONF = 'focusa.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -118,3 +120,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media files (Uploaded by users)
 MEDIA_URL = '/archivos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "archivos")
+

@@ -1,9 +1,143 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
-{% block title %}Focusa | Perfil{% endblock %}
+{% block extra_css %}
+<link href="{% static 'css/perfil.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Perfil | Focusa{% endblock %}
 
 {% block content %}
-<h1>Perfil</h1>
-<p>Bienvenido a tu perfil de usuario.</p>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Perfil</h2>
+</div>
+<div class="container-fluid py-4">
+  <div class="row g-4">
+    <!-- Icono de perfil -->
+    <div class="col-12 col-lg-3">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width:96px;height:96px;">
+            <img src="{% static 'img/foto_perfil_foca.jpg' %}" 
+                 class="img-fluid w-100 h-100 object-fit-cover" 
+                 alt="avatar">
+          </div>
+          <h6 class="mb-0 fw-semibold">
+            {{ perfil.first_name }} {{ perfil.last_name }}
+          </h6>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card del Formulario -->
+    <div class="col-12 col-lg-9">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title mb-4 fw-semibold">Datos de perfil</h5>
+          
+          <form id="perfil-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Nombres</label>
+                <input name="first_name" 
+                       class="form-control form-control-lg bg-light" 
+                       value="{{ perfil.first_name }}" 
+                       disabled>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Apellidos</label>
+                <input name="last_name" 
+                       class="form-control form-control-lg bg-light" 
+                       value="{{ perfil.last_name }}" 
+                       disabled>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Correo</label>
+                <input name="email" 
+                       type="email"
+                       class="form-control form-control-lg bg-light" 
+                       value="{{ perfil.email }}" 
+                       disabled>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Teléfono</label>
+                <input name="mobile" 
+                       class="form-control form-control-lg bg-light" 
+                       value="{{ perfil.mobile }}" 
+                       disabled>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Género</label>
+                <select name="gender" class="form-select form-select-lg bg-light" disabled>
+                  <option value="male" {% if perfil.gender == 'male' %}selected{% endif %}>Masculino</option>
+                  <option value="female" {% if perfil.gender == 'female' %}selected{% endif %}>Femenino</option>
+                  <option value="other" {% if perfil.gender == 'other' %}selected{% endif %}>Otro</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">País</label>
+                <input name="tax_country" 
+                       class="form-control form-control-lg bg-light" 
+                       value="{{ perfil.tax_country }}" 
+                       disabled>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button type="button" id="edit-btn" class="btn btn-primary btn-lg px-3">
+                <i class="bi bi-pencil-square me-2"></i>Editar
+              </button>
+              <div id="action-buttons" class="d-none">
+                <button type="submit" id="save-btn" class="btn btn-success btn-lg px-3">
+                  <i class="bi bi-check-lg me-2"></i>Guardar
+                </button>
+                <button type="button" id="cancel-btn" class="btn btn-danger btn-lg px-3">
+                  <i class="bi bi-x-lg me-2"></i>Cancelar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('perfil-form');
+    const editBtn = document.getElementById('edit-btn');
+    const actionButtons = document.getElementById('action-buttons');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const campos = form.querySelectorAll('input, select');
+    
+    const valoresIniciales = {};
+    campos.forEach(campo => {
+        valoresIniciales[campo.name] = campo.value;
+    });
+
+    editBtn.addEventListener('click', function() {
+        campos.forEach(campo => {
+            campo.disabled = false;
+            campo.classList.remove('bg-light');
+        });
+        editBtn.classList.add('d-none');
+        actionButtons.classList.remove('d-none');
+        actionButtons.classList.add('d-flex', 'gap-2');
+    });
+
+    cancelBtn.addEventListener('click', function() {
+        campos.forEach(campo => {
+            campo.value = valoresIniciales[campo.name];
+            campo.disabled = true;
+            campo.classList.add('bg-light');
+        });
+        actionButtons.classList.add('d-none');
+        actionButtons.classList.remove('d-flex', 'gap-2');
+        editBtn.classList.remove('d-none');
+    });
+  });
+</script>
 {% endblock %}

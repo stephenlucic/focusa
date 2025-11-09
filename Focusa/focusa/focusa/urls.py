@@ -7,6 +7,8 @@ urlpatterns = [
     path('', include('focusaApp.urls')),
     path('kanban/', include('Kanban.urls')),
     path('perfil/', include('perfil.urls')),
+    path('accounts/', include('usuario.urls')),
+    path('calendario/', include('calendario.urls')),
 ]
 
 handler404 = "focusaApp.views.error_404"
