@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/calendario.css' %}">
+<style>
+  #calendar { max-width:1100px; margin:0 auto; }
+</style>
+{% endblock %}
+
+{% block title %}Calendario | Focusa{% endblock %}
+
+{% block content %}
+  <div class="container py-4">
+    <h2 class="mb-4">Calendario</h2>
+    <div id="calendar"></div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+<script src="{% static 'calendario/fullcalendar/locales-all.global.min.js' %}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
+    initialView: "dayGridMonth",
+    locale: "es",
+    headerToolbar: {
+      left: "prev,next today",
+      center: "title",
+      right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+    },
+    buttonText: {
+      today: "Hoy",
+      month: "Mes",
+      week: "Semana",
+      day: "Día",
+      list: "Lista"
+    },
+    weekNumbers: false,
+    nowIndicator: true,
+    height: "auto",
+    events: window.location.pathname + "?events=1",
+  });
+  calendar.render();
+});
+</script>
+{% endblock %}
