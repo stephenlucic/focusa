@@ -79,13 +79,15 @@ DATABASES = {
         'NAME': 'focusa_bd',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'PORT': '3307',
         'OPTIONS': {
             'autocommit': True,   
         }
     }
 }
+
+# 'HOST': 'localhost',
 
 
 # Password validation
