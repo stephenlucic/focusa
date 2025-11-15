@@ -5,7 +5,14 @@ def home(request):
     return render(request, 'home.html')
 
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    series = [10, 41, 35, 51, 49, 62, 69, 91, 148]
+    labels = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep"]
+
+    data = {    
+        'series': series,
+        'labels': labels      
+    }
+    return render(request, 'dashboard.html', data)
 
 def error_404(request, exception):
     return render(request, "errors/404.html", status=404)
