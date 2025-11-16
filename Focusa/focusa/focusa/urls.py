@@ -21,7 +21,8 @@ urlpatterns = [
     # Resto de vistas de auth
     path('accounts/', include('django.contrib.auth.urls')),
 
-    path('', include('focusaApp.urls')),
+    path('', include('home.urls')),
+    path('focusa/', include('focusaApp.urls')),
     path('kanban/', include('Kanban.urls')),
     path('perfil/', include('perfil.urls')),
     path('calendario/', include('calendario.urls')),
