@@ -11,11 +11,18 @@
   box-shadow: 0 0 0 6px #ffffff, 0 0 0 8px #e6e9ef;
 }
 
+.profile-card{
+  border-radius: 24px;        /* ajusta 16–32px a gusto */
+  overflow: hidden;           /* recorta contenido a las esquinas */
+  border: 1px solid #e9ecef;  /* opcional: borde sutil */
+}
+
 @media (min-width: 1200px){
     .profile-avatar {
         width: 200px;
         height: 200px;
     }
+    .profile-card{ border-radius: 28px; }
 }
 
 

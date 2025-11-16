@@ -134,3 +134,7 @@
   border-color: #0d6efd;
   background: rgba(13, 110, 253, 0.05);
 }
+
+.tablero-card{
+    border: 1px solid #e9ecef;  /* opcional: borde sutil */
+}

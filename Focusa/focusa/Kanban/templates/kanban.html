@@ -15,143 +15,152 @@
   </button>
 </div>
 
-<div class="kanban-container">
-  <div class="kanban-board">
-    
-    <!-- Columna To Do -->
-    <div class="kanban-column column-todo">
-      <div class="kanban-header">
-        <h5 class="d-flex align-items-center">
-          Por Hacer
-          <span class="task-count">3</span>
-        </h5>
-      </div>
-      <div class="kanban-body">
-        <div class="kanban-card">
-          <div class="card-title">Implementar sistema de autenticación</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-high"></span>
-              <span class="task-id">TASK-001</span>
-            </div>
-            <div class="task-assignee">ER</div>
-          </div>
-        </div>
-        
-        <div class="kanban-card">
-          <div class="card-title">Diseñar interfaz de usuario</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-medium"></span>
-              <span class="task-id">TASK-002</span>
-            </div>
-            <div class="task-assignee">JD</div>
-          </div>
-        </div>
-        
-        <div class="kanban-card">
-          <div class="card-title">Configurar base de datos</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-low"></span>
-              <span class="task-id">TASK-003</span>
-            </div>
-            <div class="task-assignee">MG</div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Columna In Progress -->
-    <div class="kanban-column column-progress">
-      <div class="kanban-header">
-        <h5 class="d-flex align-items-center">
-          En Progreso
-          <span class="task-count">2</span>
-        </h5>
-      </div>
-      <div class="kanban-body">
-        <div class="kanban-card">
-          <div class="card-title">Desarrollar API REST</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-high"></span>
-              <span class="task-id">TASK-004</span>
+<div class="card tablero-card rounded-5">
+    <div class="card-body p-3">
+      <div class="kanban-container">
+        <div class="kanban-board">
+          
+          <!-- Columna To Do -->
+          <div class="kanban-column column-todo">
+            <div class="kanban-header">
+              <h5 class="d-flex align-items-center">
+                Por Hacer
+                <span class="task-count">3</span>
+              </h5>
             </div>
-            <div class="task-assignee">ER</div>
-          </div>
-        </div>
-        
-        <div class="kanban-card">
-          <div class="card-title">Integrar sistema de pagos</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-medium"></span>
-              <span class="task-id">TASK-005</span>
+            <div class="kanban-body">
+              <div class="kanban-card">
+                <div class="card-title">Implementar sistema de autenticación</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-high"></span>
+                    <span class="task-id">TASK-001</span>
+                  </div>
+                  <div class="task-assignee">ER</div>
+                </div>
+              </div>
+              
+              <div class="kanban-card">
+                <div class="card-title">Diseñar interfaz de usuario</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-medium"></span>
+                    <span class="task-id">TASK-002</span>
+                  </div>
+                  <div class="task-assignee">JD</div>
+                </div>
+              </div>
+              
+              <div class="kanban-card">
+                <div class="card-title">Configurar base de datos</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-low"></span>
+                    <span class="task-id">TASK-003</span>
+                  </div>
+                  <div class="task-assignee">MG</div>
+                </div>
+              </div>
             </div>
-            <div class="task-assignee">AB</div>
           </div>
+      
+          <!-- Columna In Progress -->
+          <div class="kanban-column column-progress">
+            <div class="kanban-header">
+              <h5 class="d-flex align-items-center">
+                En Progreso
+                <span class="task-count">2</span>
+              </h5>
+            </div>
+            <div class="kanban-body">
+              <div class="kanban-card">
+                <div class="card-title">Desarrollar API REST</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-high"></span>
+                    <span class="task-id">TASK-004</span>
+                  </div>
+                  <div class="task-assignee">ER</div>
+                </div>
+              </div>
+              
+              <div class="kanban-card">
+                <div class="card-title">Integrar sistema de pagos</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-medium"></span>
+                    <span class="task-id">TASK-005</span>
+                  </div>
+                  <div class="task-assignee">AB</div>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Columna Review -->
+          <div class="kanban-column column-review">
+            <div class="kanban-header">
+              <h5 class="d-flex align-items-center">
+                En Revisión
+                <span class="task-count">1</span>
+              </h5>
+            </div>
+            <div class="kanban-body">
+              <div class="kanban-card">
+                <div class="card-title">Pruebas de integración</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-medium"></span>
+                    <span class="task-id">TASK-006</span>
+                  </div>
+                  <div class="task-assignee">QA</div>
+                </div>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Columna Done -->
+          <div class="kanban-column column-done">
+            <div class="kanban-header">
+              <h5 class="d-flex align-items-center">
+                Completado
+                <span class="task-count">2</span>
+              </h5>
+            </div>
+            <div class="kanban-body">
+              <div class="kanban-card">
+                <div class="card-title">Setup inicial del proyecto</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-low"></span>
+                    <span class="task-id">TASK-007</span>
+                  </div>
+                  <div class="task-assignee">ER</div>
+                </div>
+              </div>
+              
+              <div class="kanban-card">
+                <div class="card-title">Documentación técnica</div>
+                <div class="card-meta">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="task-priority priority-low"></span>
+                    <span class="task-id">TASK-008</span>
+                  </div>
+                  <div class="task-assignee">TW</div>
+                </div>
+              </div>
+            </div>
+          </div>
+      
         </div>
       </div>
+  
     </div>
+</div>  
 
-    <!-- Columna Review -->
-    <div class="kanban-column column-review">
-      <div class="kanban-header">
-        <h5 class="d-flex align-items-center">
-          En Revisión
-          <span class="task-count">1</span>
-        </h5>
-      </div>
-      <div class="kanban-body">
-        <div class="kanban-card">
-          <div class="card-title">Pruebas de integración</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-medium"></span>
-              <span class="task-id">TASK-006</span>
-            </div>
-            <div class="task-assignee">QA</div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Columna Done -->
-    <div class="kanban-column column-done">
-      <div class="kanban-header">
-        <h5 class="d-flex align-items-center">
-          Completado
-          <span class="task-count">2</span>
-        </h5>
-      </div>
-      <div class="kanban-body">
-        <div class="kanban-card">
-          <div class="card-title">Setup inicial del proyecto</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-low"></span>
-              <span class="task-id">TASK-007</span>
-            </div>
-            <div class="task-assignee">ER</div>
-          </div>
-        </div>
-        
-        <div class="kanban-card">
-          <div class="card-title">Documentación técnica</div>
-          <div class="card-meta">
-            <div class="d-flex align-items-center gap-2">
-              <span class="task-priority priority-low"></span>
-              <span class="task-id">TASK-008</span>
-            </div>
-            <div class="task-assignee">TW</div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-  </div>
-</div>
 {% endblock %}
 
 {% block extra_js %}
