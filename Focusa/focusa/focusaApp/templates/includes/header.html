@@ -16,13 +16,18 @@
         <span class="badge rounded-pill">2</span>
       </button>
 
-      <!-- Perfil (estático) -->
+      <!-- Perfil (dinámico) -->
       <div class="dropdown">
         <button class="btn btn-focusa-profile text-white d-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
           <!-- Texto a la izquierda -->
           <span class="profile-info d-none d-sm-flex flex-column text-start me-2">
-            <span class="fw-semibold">Evelyn Ramos S.</span>
-            <small class="text-white-50">Ingeniera Informática</small>
+            {% if user.is_authenticated %}
+              <span class="fw-semibold">{{ user.get_full_name|default:user.username }}</span>
+              <small class="text-white-50">{{ user.perfil.ocupacion|default:"Sin ocupación" }}</small>
+            {% else %}
+              <span class="fw-semibold">Invitado</span>
+              <small class="text-white-50">—</small>
+            {% endif %}
           </span>
           <!-- Avatar a la derecha -->
           <span class="avatar rounded-circle d-inline-flex">
@@ -34,7 +39,12 @@
           <li><a class="dropdown-item" href="#">Perfil</a></li>
           <li><a class="dropdown-item" href="#">Configuración</a></li>
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="#">Cerrar sesión</a></li>
+          <li>
+            <form method="post" action="{% url 'logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="dropdown-item">Cerrar sesión</button>
+            </form>
+          </li>
         </ul>
       </div>
     </div>

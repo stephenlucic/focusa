@@ -1,0 +1,171 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Focusa | Registrarse</title>
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+<div class="container-fluid min-vh-100">
+  <div class="row g-0 min-vh-100">
+    <div class="col-12 col-lg-6 d-flex align-items-center position-relative login-left has-brand">
+      <a href="/" class="login-brand">
+        <img src="{% static 'img/focusa_sin_fondo.png' %}" alt="Focusa">
+      </a>
+
+      <div class="w-100 px-4 px-md-5 py-5" style="max-width: 520px; margin-left:auto; margin-right:auto;">
+        <div class="mb-4">
+          <h1 class="display-6 fw-semibold mb-1">Crea tu cuenta</h1>
+          <p class="text-muted mb-0">Solo usuario y contraseña, más tus datos</p>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="{{ form.username.id_for_label }}" class="form-label">Usuario</label>
+            <input type="text" name="username" id="{{ form.username.id_for_label }}"
+                   class="form-control form-control-lg{% if form.username.errors %} is-invalid{% endif %}"
+                   value="{{ form.username.value|default_if_none:'' }}" required autocomplete="username">
+            {% if form.username.errors %}<div class="invalid-feedback d-block">{{ form.username.errors|striptags }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+            <input type="email" name="email" id="{{ form.email.id_for_label }}"
+                   class="form-control form-control-lg{% if form.email.errors %} is-invalid{% endif %}"
+                   value="{{ form.email.value|default_if_none:'' }}" required autocomplete="email" placeholder="example@dominio.com">
+            {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors|striptags }}</div>{% endif %}
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.first_name.id_for_label }}" class="form-label">Nombre</label>
+              <input type="text" name="first_name" id="{{ form.first_name.id_for_label }}"
+                     class="form-control form-control-lg{% if form.first_name.errors %} is-invalid{% endif %}"
+                     value="{{ form.first_name.value|default_if_none:'' }}" required autocomplete="given-name">
+              {% if form.first_name.errors %}<div class="invalid-feedback d-block">{{ form.first_name.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.last_name.id_for_label }}" class="form-label">Apellido</label>
+              <input type="text" name="last_name" id="{{ form.last_name.id_for_label }}"
+                     class="form-control form-control-lg{% if form.last_name.errors %} is-invalid{% endif %}"
+                     value="{{ form.last_name.value|default_if_none:'' }}" required autocomplete="family-name">
+              {% if form.last_name.errors %}<div class="invalid-feedback d-block">{{ form.last_name.errors|striptags }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.ocupacion.id_for_label }}" class="form-label">Ocupación</label>
+            <input type="text" name="ocupacion" id="{{ form.ocupacion.id_for_label }}"
+                   class="form-control form-control-lg{% if form.ocupacion.errors %} is-invalid{% endif %}"
+                   value="{{ form.ocupacion.value|default_if_none:'' }}" autocomplete="organization-title">
+            {% if form.ocupacion.errors %}<div class="invalid-feedback d-block">{{ form.ocupacion.errors|striptags }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.telefono.id_for_label }}" class="form-label">Teléfono</label>
+            <input type="text" name="telefono" id="{{ form.telefono.id_for_label }}"
+                   class="form-control form-control-lg{% if form.telefono.errors %} is-invalid{% endif %}"
+                   value="{{ form.telefono.value|default_if_none:'' }}" autocomplete="tel" placeholder="+56 9 1234 5678">
+            {% if form.telefono.errors %}<div class="invalid-feedback d-block">{{ form.telefono.errors|striptags }}</div>{% endif %}
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.genero.id_for_label }}" class="form-label">Género</label>
+              <select name="genero" id="{{ form.genero.id_for_label }}"
+                      class="form-select form-select-lg{% if form.genero.errors %} is-invalid{% endif %}">
+                <option value="" {% if not form.genero.value %}selected{% endif %}>Selecciona…</option>
+                <option value="M" {% if form.genero.value == 'M' %}selected{% endif %}>Masculino</option>
+                <option value="F" {% if form.genero.value == 'F' %}selected{% endif %}>Femenino</option>
+                <option value="O" {% if form.genero.value == 'O' %}selected{% endif %}>Otro</option>
+                <option value="N" {% if form.genero.value == 'N' %}selected{% endif %}>Prefiero no decir</option>
+              </select>
+              {% if form.genero.errors %}<div class="invalid-feedback d-block">{{ form.genero.errors|striptags }}</div>{% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.pais.id_for_label }}" class="form-label">País</label>
+              <select name="pais" id="{{ form.pais.id_for_label }}"
+                      class="form-select form-select-lg{% if form.pais.errors %} is-invalid{% endif %}">
+                <option value="" {% if not form.pais.value %}selected{% endif %}>Selecciona…</option>
+                <option value="Chile" {% if form.pais.value == 'Chile' %}selected{% endif %}>Chile</option>
+                <option value="Argentina" {% if form.pais.value == 'Argentina' %}selected{% endif %}>Argentina</option>
+                <option value="Perú" {% if form.pais.value == 'Perú' %}selected{% endif %}>Perú</option>
+                <option value="México" {% if form.pais.value == 'México' %}selected{% endif %}>México</option>
+                <option value="Colombia" {% if form.pais.value == 'Colombia' %}selected{% endif %}>Colombia</option>
+                <option value="España" {% if form.pais.value == 'España' %}selected{% endif %}>España</option>
+                <option value="Otro" {% if form.pais.value == 'Otro' %}selected{% endif %}>Otro</option>
+              </select>
+              {% if form.pais.errors %}<div class="invalid-feedback d-block">{{ form.pais.errors|striptags }}</div>{% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.password1.id_for_label }}" class="form-label">Contraseña</label>
+            <div class="input-group input-group-lg">
+              <input type="password" name="password1" id="{{ form.password1.id_for_label }}"
+                     class="form-control form-control-lg{% if form.password1.errors %} is-invalid{% endif %}"
+                     required autocomplete="new-password" placeholder="••••••••">
+              <button type="button" class="btn password-toggle" id="togglePass1"><i class="bi bi-eye"></i></button>
+            </div>
+            {% if form.password1.errors %}<div class="invalid-feedback d-block">{{ form.password1.errors|striptags }}</div>{% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label for="{{ form.password2.id_for_label }}" class="form-label">Repite la contraseña</label>
+            <div class="input-group input-group-lg">
+              <input type="password" name="password2" id="{{ form.password2.id_for_label }}"
+                     class="form-control form-control-lg{% if form.password2.errors %} is-invalid{% endif %}"
+                     required autocomplete="new-password" placeholder="••••••••">
+              <button type="button" class="btn password-toggle" id="togglePass2"><i class="bi bi-eye"></i></button>
+            </div>
+            {% if form.password2.errors %}<div class="invalid-feedback d-block">{{ form.password2.errors|striptags }}</div>{% endif %}
+          </div>
+
+          <button type="submit" class="btn btn-brand btn-lg w-100">Crear cuenta</button>
+
+          <div class="text-center mt-3">
+            <small>¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a></small>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-6 d-none d-lg-flex login-side align-items-center justify-content-center">
+      <img src="{% static 'img/login.png' %}" alt="" class="img-fluid illustration">
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script>
+(() => {
+  const t1 = document.getElementById('togglePass1');
+  const p1 = document.getElementById('{{ form.password1.id_for_label }}');
+  t1?.addEventListener('click', () => {
+    const show = p1.type === 'password';
+    p1.type = show ? 'text' : 'password';
+    t1.querySelector('i')?.classList.toggle('bi-eye-slash', show);
+    t1.querySelector('i')?.classList.toggle('bi-eye', !show);
+  });
+  const t2 = document.getElementById('togglePass2');
+  const p2 = document.getElementById('{{ form.password2.id_for_label }}');
+  t2?.addEventListener('click', () => {
+    const show = p2.type === 'password';
+    p2.type = show ? 'text' : 'password';
+    t2.querySelector('i')?.classList.toggle('bi-eye-slash', show);
+    t2.querySelector('i')?.classList.toggle('bi-eye', !show);
+  });
+})();
+</script>
+</body>
+</html>

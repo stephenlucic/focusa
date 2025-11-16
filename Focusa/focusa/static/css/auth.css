@@ -1,0 +1,111 @@
+:root {
+  --brand: #3B4178; /* morado */
+  --brand-strong: #303570;
+  --panel: #7b57d1;
+  --panel-2: #a084e8;
+}
+
+.btn-brand {
+  background-color: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.btn-brand:hover {
+  background-color: var(--brand-strong);
+  border-color: var(--brand-strong);
+}
+
+.login-side {
+  background: linear-gradient(135deg, var(--panel), var(--panel-2));
+  color: #fff;
+  position: relative;      /* nuevo */
+  overflow: hidden;        /* nuevo */
+}
+
+/* Hace que la imagen cubra toda la columna */
+.illustration {
+  position: absolute;      /* nuevo */
+  inset: 0;                /* nuevo */
+  width: 100%;             /* nuevo */
+  height: 100%;            /* nuevo */
+  object-fit: cover;       /* nuevo */
+  object-position: center; /* nuevo */
+  max-width: none;         /* override del anterior */
+  filter: none;            /* sin sombra */
+}
+
+/* Col izquierda como contenedor relativo */
+.login-left {
+  position: relative;
+}
+.login-left.has-brand {
+  padding-top: clamp(56px, 6vw, 88px); /* deja espacio bajo el logo fijo */
+}
+
+@media (max-width: 991.98px) {
+  .login-brand img { height: 44px; }  /* tamaño en mobile */
+  .login-left.has-brand { padding-top: 48px; }
+}
+
+/* Logo fijo en la esquina superior izquierda */
+.login-brand {
+  position: absolute;
+  top: 24px;
+  left: clamp(16px, 3vw, 32px);
+  z-index: 3;
+}
+.login-brand img {
+  height: 60px;   /* antes 44px */
+  width: auto;
+  display: block;
+}
+
+/* Colorea mensajes de error de Django y ajusta tamaño/espacio */
+.errorlist,
+.invalid-feedback {
+  color: var(--bs-danger, #dc3545);
+  font-size: 0.875rem;
+  margin-top: .25rem;
+  margin-bottom: 0;
+  list-style: none;
+  padding-left: 0;
+}
+.errorlist li { margin: 0; }
+
+/* Asegura borde rojo si se aplica is-invalid (Bootstrap ya trae estilos) */
+.form-control.is-invalid {
+  border-color: var(--bs-danger, #dc3545);
+}
+
+.input-group .form-control {
+  border-right: 0; /* evita doble línea al tocar el botón */
+}
+
+.input-group .password-toggle {
+  background: #fff;
+  border: 1px solid var(--bs-border-color, #ced4da); /* mismo color que el input */
+  border-left: 0;                                    /* se une al input */
+  color: var(--bs-secondary-color, #6c757d);
+  box-shadow: none;
+  line-height: 1;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: var(--bs-border-radius-lg, .5rem);
+  border-bottom-right-radius: var(--bs-border-radius-lg, .5rem);
+}
+.input-group .password-toggle:hover {
+  background: #f8f9fa;
+  border-color: var(--bs-border-color, #ced4da);
+}
+
+.input-group .form-control.is-invalid {
+  border-right: 0;
+}
+.input-group .form-control.is-invalid + .password-toggle {
+  border-color: var(--bs-danger, #dc3545);           /* rojo cuando hay error */
+}
+
+/* Deja espacio superior para el logo fijo */
+.brand-spacer {
+  padding-top: clamp(84px, 9vw, 128px);
+}
