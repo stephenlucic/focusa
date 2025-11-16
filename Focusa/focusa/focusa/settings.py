@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'perfil',
     'calendario',
     'home',
+    'dashboard',
 ]
 
 MIDDLEWARE = [

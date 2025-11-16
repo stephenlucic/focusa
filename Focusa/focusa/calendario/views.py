@@ -8,22 +8,25 @@ def calendario(request):
         today = datetime.now()
         data = [
             {
-                "title": "Diseño Interfaz Usuario",
+                "title": "Diseño de la interfaz",
                 "start": (today + timedelta(days=1)).strftime("%Y-%m-%d"),
                 "allDay": True,
+                "className": ["fc-event-azul"]
             },
             {
                 "title": "Configuración base de datos",
                 "start": (today + timedelta(days=3)).strftime("%Y-%m-%d"),
                 "allDay": True,
+                "className": ["fc-event-verde"]
             },
             {
                 "title": "Desarrollar API REST",
                 "start": (today + timedelta(days=0)).strftime("%Y-%m-%d"),
                 "allDay": True,
+                "className": ["fc-event-amarillo"]
             },
         ]
         return JsonResponse(data, safe=False)
 
-    # Renderizamos directamente calendario.html (sin subcarpeta)
+    # Renderizamos directamente calendario.html
     return render(request, "calendario.html")

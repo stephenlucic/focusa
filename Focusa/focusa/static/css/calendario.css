@@ -1,118 +1,266 @@
-/* Oculta los números de semana en FullCalendar */
+/* Wrapper general (ocupa todo el ancho del contenido) */
+.calendar-wrapper {
+  width: 100%;
+  padding: 1.5rem 2rem 2rem;
+  margin: 0;
+}
+
+/* Tarjeta tipo Google donde vive el calendario */
+.calendar-shell {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 1.5rem 1.25rem;
+}
+
+/* El div de FullCalendar en sí no agrega más padding ni sombra */
+#calendar {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+:root {
+  --focusa-dark-blue: #303570;
+  --focusa-dark: #3B4178;
+  --focusa-medium-blue: #606593;
+  --focusa-lightest-blue: #F7F8FA;
+
+  --focusa-text: #142127;
+  --focusa-muted: #6b7a86;
+  --focusa-bg: #f7fafc;
+}
+
+/* ================================
+   FullCalendar – Estilo Focusa
+   ================================ */
+
+/* Oculta los números de semana */
 .fc .fc-week-number,
 .fc .fc-weeknumbers {
-    display: none !important;
+  display: none !important;
 }
 
-/* Fondo y bordes suaves para el calendario */
+/* Contenedor principal del calendario */
 #calendar {
-    background: #fff;
-    border-radius: 1.5rem;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    padding: 2rem 1rem;
-    margin-bottom: 2rem;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
 }
 
-/* Títulos y cabecera */
+/* Título (Noviembre 2025) */
 .fc-toolbar-title {
-    font-family: 'Open Sans', sans-serif;
-    font-weight: 700;
-    color: #2a2a2a;
-    font-size: 2rem;
-    margin-bottom: 1rem;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 750;
+  color: var(--focusa-text);
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .fc-header-toolbar {
-    margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-/* Botones redondeados estilo Bootstrap */
-.fc .fc-button, .fc .fc-button-group > .fc-button {
-    border-radius: 2rem !important;
-    background: #3b4cca !important;
-    color: #fff !important;
-    border: none !important;
-    font-weight: 600;
-    padding: 0.5rem 1.2rem;
-    box-shadow: 0 2px 8px rgba(59,76,202,0.08);
-    transition: background 0.2s;
-    margin-right: 0.5rem;
+/* ================================
+   Botones (Hoy, Mes, Lista, flechas)
+   ================================ */
+.fc .fc-button,
+.fc .fc-button-group > .fc-button {
+  border-radius: 2rem !important;
+  background: var(--focusa-dark-blue) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+  box-shadow: 0 2px 8px rgba(48, 53, 112, 0.18);
+  transition: background 0.2s, transform 0.15s;
+  margin-right: 0.5rem;
 }
 
-.fc .fc-button:hover, .fc .fc-button:focus,
-.fc .fc-button-active {
-    background: #2a2a2a !important;
-    color: #fff !important;
+.fc .fc-button:hover,
+.fc .fc-button:focus,
+.fc .fc-button.fc-button-active {
+  background: var(--focusa-dark) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
 }
 
-/* Números y eventos */
-.fc-daygrid-day-number, .fc-list-day-cushion {
-    color: #3b4cca;
-    font-weight: 600;
-}
-
-.fc-daygrid-event {
-    font-size: 0.92em;
-    padding: 2px 8px;
-    border-radius: 1rem;
-    background: #fff;
-    border: 2px solid #3b4cca;
-    color: #2a2a2a !important;
-    font-weight: 600;
-    min-width: 120px;         /* ancho mínimo para todos los eventos */
-    max-width: 120px;         /* ancho máximo igual para todos */
-    text-align: center;       /* centra el texto */
-    box-shadow: 0 2px 8px rgba(59,76,202,0.08);
-    opacity: 1 !important;
-    white-space: normal;      /* permite que el texto se parta si es largo */
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.fc-event-title {
-    color: #2a2a2a !important;
-    font-weight: 600;
-}
-
-.fc-day-today {
-    background: #f8f9fa !important;
-}
-
+/* ================================
+   Cabecera de días (Dom, Lun, ...)
+   ================================ */
 .fc-col-header-cell {
-    background: #f3f6fa;
-    color: #3b4cca;
-    font-weight: 700;
-    font-size: 1.1em;
-    border-bottom: 2px solid #eaf0ff;
+  background: #f3f6fa;
+  font-weight: 700;
+  font-size: 1.05em;
+  border-bottom: 2px solid #eaf0ff;
 }
 
-/* Lista de eventos */
+/* Texto de cabecera: sin subrayado, color Focusa y capitalizado */
+#calendar th.fc-col-header-cell a.fc-col-header-cell-cushion,
+#calendar th.fc-col-header-cell a.fc-col-header-cell-cushion:hover {
+  color: var(--focusa-dark) !important;
+  text-decoration: none !important;
+  text-transform: capitalize !important; /* dom -> Dom */
+}
+
+/* ================================
+   Números de los días
+   ================================ */
+.fc-daygrid-day-number,
+.fc-list-day-cushion {
+  color: var(--focusa-dark-blue);
+  font-weight: 600;
+}
+
+/* Números sin subrayado ni cambio en hover */
+#calendar td a.fc-daygrid-day-number,
+#calendar td a.fc-daygrid-day-number:hover {
+  text-decoration: none !important;
+}
+
+/* Día actual */
+.fc-day-today {
+  background: #f7f8fc !important;
+}
+
+/* ================================
+   Eventos (tarjetas dentro de los días)
+   ================================ */
+.fc-daygrid-event {
+  display: block;
+  box-sizing: border-box;
+
+  /* separarlo un poquito del borde de la celda */
+  margin: 3px 4px 0;
+  padding: 4px 8px;
+
+  border-radius: 0.4rem;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: left;
+
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Asegurar que el contenido interno herede bien el color */
+.fc-daygrid-event .fc-event-main {
+  white-space: normal;
+}
+
+/* ===== Paleta de tarjetas (más fuertes) ===== */
+
+/* Azul */
+.fc-event-azul {
+  background: #2c70b8;          /* relleno fuerte */
+  color: #ffffff !important;    /* texto blanco */
+}
+
+/* Verde */
+.fc-event-verde {
+  background: #0c9c67;
+  color: #ffffff !important;
+}
+
+/* Amarillo */
+.fc-event-amarillo {
+  background: #fed700;
+  color: #142127 !important;    /* texto oscuro para contraste */
+}
+
+/* ================================
+   Vista Lista
+   ================================ */
+
+/* Cabecera de cada día en la lista */
+#calendar .fc-list-day-cushion {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.2rem;               /* espacio entre "Sábado" y la fecha */
+  padding: 0.75rem 1rem;
+  background: var(--focusa-lightest-blue);
+  color: var(--focusa-dark);
+  border-radius: 0.75rem;
+  font-weight: 700;
+}
+
+/* Enlaces dentro del encabezado del día */
+#calendar .fc-list-day-cushion a {
+  color: var(--focusa-dark-blue) !important;
+  text-decoration: none !important;
+}
+
+/* Texto del día: "Sábado" */
+#calendar .fc-list-day-cushion .fc-list-day-text {
+  text-transform: capitalize !important;       /* sábado -> Sábado */
+  font-weight: 700;
+}
+
+/* Texto de la fecha: "15 de noviembre 2025" (ya viene del JS) */
+#calendar .fc-list-day-cushion .fc-list-day-side-text {
+  position: static !important;
+  margin-left: 0 !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--focusa-dark-blue) !important;
+}
+
+/* Tarjeta de cada evento en la lista */
 .fc-list-event {
-    border-left: 4px solid #3b4cca;
-    background: #f8f9fa;
-    border-radius: 1rem;
+  border-left: 4px solid var(--focusa-dark-blue);
+  background: #f8f9fa;
+  border-radius: 4rem;
 }
 
 .fc-list-event:hover {
-    background: #eaf0ff;
+  background: #eaf0ff;
 }
 
 .fc-list-event-title {
-    font-weight: 600;
-    color: #2a2a2a;
+  font-weight: 600;
+  color: var(--focusa-text);
 }
 
-.fc-list-event-time {
-    color: #3b4cca;
-    font-weight: 500;
+/* Ocultar la hora (si no la usas) */
+#calendar .fc-list-event-time {
+  display: none !important;
 }
 
-/* Responsive */
+/* Puntito morado de los eventos */
+.fc .fc-list-event-dot {
+  background: var(--focusa-dark) !important;
+  border-color: var(--focusa-dark) !important;
+}
+
+
+/* ================================
+   Reglas generales de links en el calendario
+   ================================ */
+#calendar .fc a,
+#calendar .fc a:hover {
+  text-decoration: none !important;
+  color: inherit !important;   /* que usen el color que definimos arriba */
+}
+
+/* ================================
+   Responsive
+   ================================ */
 @media (max-width: 768px) {
-    #calendar {
-        padding: 1rem 0.2rem;
-    }
-    .fc-toolbar-title {
-        font-size: 1.3rem;
-    }
+  #calendar {
+    padding: 1rem 0.4rem;
+    border-radius: 1rem;
+  }
+  .fc-toolbar-title {
+    font-size: 1.3rem;
+  }
 }

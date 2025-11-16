@@ -3,18 +3,17 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/calendario.css' %}">
-<style>
-  #calendar { max-width:1100px; margin:0 auto; }
-</style>
+<link rel="stylesheet" href="{% static 'calendario/fullcalendar/index.css' %}">
 {% endblock %}
 
 {% block title %}Calendario | Focusa{% endblock %}
 
 {% block content %}
-  <div class="container py-4">
-    <h2 class="mb-4">Calendario</h2>
+
+<div class="calendar-wrapper">
     <div id="calendar"></div>
-  </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -26,22 +25,41 @@ document.addEventListener("DOMContentLoaded", () => {
   const calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
     initialView: "dayGridMonth",
     locale: "es",
+    firstDay: 1,
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+      right: "dayGridMonth,listWeek"
     },
     buttonText: {
       today: "Hoy",
       month: "Mes",
-      week: "Semana",
-      day: "Día",
       list: "Lista"
     },
+    dayHeaderFormat: { weekday: "long" },
     weekNumbers: false,
     nowIndicator: true,
     height: "auto",
     events: window.location.pathname + "?events=1",
+
+    datesSet(info) {
+      const titleEl = document.querySelector(".fc-toolbar-title");
+      if (!titleEl) return;
+
+      const view = info.view;
+      if (view.type.startsWith("list")) {
+        const start = view.currentStart;
+        const end = new Date(view.currentEnd);
+        end.setDate(end.getDate() - 1); // fin inclusivo
+        const month = start.toLocaleDateString("es-ES", { month: "long" });
+        const monthCap = month.charAt(0).toUpperCase() + month.slice(1);
+        titleEl.textContent = `${start.getDate()} – ${end.getDate()} ${monthCap} ${start.getFullYear()}`;
+      } else {
+        let txt = view.title.replace(" de ", " "); // Noviembre 2025
+        txt = txt.charAt(0).toUpperCase() + txt.slice(1);
+        titleEl.textContent = txt;
+      }
+    },
   });
   calendar.render();
 });
