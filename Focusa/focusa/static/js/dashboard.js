@@ -111,12 +111,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const stacked = (el.dataset.stacked || 'false') === 'true';
     const height = parseInt(el.dataset.height || 320, 10);
 
-    // Para donut/pie si series es simple array de números
-    if ((type === 'donut' || type === 'pie') && Array.isArray(series)) {
-      // si es solo números ya sirve; si es array de objetos con data se transforma dentro
+    const options = makeOptions(type, labels, series, stacked, height);
+
+    // 🎨 Colores específicos por gráfico (armónico con Focusa)
+    switch (el.id) {
+      case 'chart-progreso':
+        // Completadas (azul) vs Creadas (amarillo)
+        options.colors = ['#2C70B8', '#7FAFDD'];
+        break;
+
+      case 'chart-estados':
+        // Por hacer, En proceso, En revisión, Completo
+        options.colors = ['#7FAFDD', '#FFC048', '#2C70B8', '#4CAF50'];
+        break;
+
+      case 'chart-prioridades':
+        // Alta, Media, Baja (igual que tus badges)
+        options.colors = ['#D9364F', '#FFB347', '#8AB4F8'];
+        break;
+
+      case 'chart-heatmap':
+        // si quieres un gradiente más suave
+        options.plotOptions.heatmap.colorScale.ranges = [
+          { from: 0,  to: 10, color: '#8AB4F8', name: 'Bajo'  },
+          { from: 11, to: 18, color: '#2C70B8', name: 'Medio' },
+          { from: 19, to: 30, color: '#303570', name: 'Alto'  }
+        ];
+        break;
+
+      default:
+        // otros gráficos usan la paleta base de focusaTheme
+        break;
     }
 
-    const options = makeOptions(type, labels, series, stacked, height);
     new ApexCharts(el, options).render();
   });
 });

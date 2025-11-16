@@ -1,173 +1,162 @@
-/* Estilos principales de dashboard */ 
+/* Dashboard Focusa (unificado) */
 
-.focusa-card {
-  background: #ffffff;
+/* Paleta base (ajusta si ya están en :root global) */
+:root {
+  --focusa-bg: #ffffff;
+  --focusa-border: #E5E7EB;
+  --focusa-shadow-sm: 0 2px 6px rgba(15,23,42,.06);
+  --focusa-shadow-lg: 0 8px 24px rgba(15,23,42,.08);
+  --focusa-shadow-hover: 0 12px 32px rgba(15,23,42,.10);
+  --focusa-dark: #303570;
+  --focusa-dark-alt: #3B4178;
+  --focusa-gray: #6B7280;
+  --focusa-gray-light: #F3F4F6;
+  --focusa-gray-xlight: #F9FAFB;
+  --focusa-gradient: linear-gradient(90deg,#303570,#4F46E5);
+}
+
+/* Cards genéricas */
+.card {
+  background: var(--focusa-bg);
+  border: 1px solid var(--focusa-border);
   border-radius: 18px;
-  padding: 16px 18px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  border: 1px solid #E5E7EB;
+  box-shadow: var(--focusa-shadow-lg);
+  overflow: hidden;
 }
 
-.focusa-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 10px;
+.card-header {
+  background: var(--focusa-gray-xlight);
+  border-bottom: 1px solid var(--focusa-border);
+  font: 600 14px "Open Sans",sans-serif;
+  color: var(--focusa-dark);
 }
 
-.focusa-card-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  color: #303570; /* Focusa main */
-  font-family: "Open Sans", sans-serif;
-}
-
-.focusa-card-header span {
-  font-size: 12px;
-  color: #6B7280;
-  font-family: "Open Sans", sans-serif;
-}
+/* Métricas superiores */
+.metric-row { margin-bottom: 32px; }
 
 .metric-card {
-  background:#fff;
-  border:1px solid #e5e8f0;
-  border-radius:1rem;
-  padding:1.25rem 1.25rem 0.75rem;
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  gap:.35rem;
-  box-shadow:0 2px 6px rgba(48,53,112,.06);
+  background: var(--focusa-bg);
+  border: 1px solid var(--focusa-border);
+  border-radius: 24px;
+  box-shadow: var(--focusa-shadow-lg);
+  width: 100%;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-family: "Open Sans",sans-serif;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--focusa-shadow-hover);
 }
 .metric-value {
-  font-size:2.2rem;
-  font-weight:700;
-  line-height:1;
-  color:var(--focusa-dark-blue);
-  letter-spacing:.5px;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--focusa-dark);
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: .5px;
 }
 .metric-label {
-  font-size:.85rem;
-  font-weight:600;
-  color:var(--focusa-medium-blue);
-  text-transform:none;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--focusa-gray);
 }
-.metric-spark {
-  margin-top:.5rem;
-}
-.metric-card .apexcharts-canvas {
-  position:static !important;
-}
+.metric-spark { margin-top: .5rem; }
+.metric-card .apexcharts-canvas { position: static !important; }
 
+/* Tabla de tareas */
 .task-table thead th {
-  font-size:.75rem;
-  text-transform:uppercase;
-  letter-spacing:.5px;
-  background:#f7f8fa;
-  border-bottom:1px solid #e1e4ec;
+  font: 600 12px "Open Sans",sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  background: var(--focusa-gray-light);
+  border-bottom: 1px solid var(--focusa-border);
+  color: var(--focusa-gray);
 }
 .task-table tbody td {
-  font-size:.85rem;
-  border-color:#f0f2f6;
+  font-size: 14px;
+  border-color: var(--focusa-gray-light);
+  font-family: "Open Sans",sans-serif;
 }
+
+/* Progreso fino */
 .progress-thin {
-  height:6px;
-  background:#e4e7ef;
-  border-radius:4px;
-  margin-bottom:4px;
+  height: 6px;
+  background: var(--focusa-border);
+  border-radius: 999px;
+  margin-bottom: 4px;
+  overflow: hidden;
 }
 .progress-thin .progress-bar {
-  background:linear-gradient(90deg,#3B4178,#606593);
-  border-radius:4px;
+  background: var(--focusa-gradient);
+  height: 100%;
+  border-radius: 999px;
 }
 
+/* Badges estados */
 .badge {
-  font-size:.65rem;
-  padding:.35rem .55rem;
-  border-radius:.5rem;
-  font-weight:600;
-  letter-spacing:.3px;
-}
-.badge.state-por-hacer { background:#fff; color:#606593; border:1px solid #606593; }
-.badge.state-en-proceso { background:#606593; color:#fff; }
-.badge.state-en-revision { background:#303570; color:#fff; }
-.badge.state-completo { background:#34a853; color:#fff; }
-
-.badge.priority-alta { background:#d9364f; color:#fff; }
-.badge.priority-media { background:#ffb347; color:#fff; }
-.badge.priority-baja { background:#8ab4f8; color:#fff; }
-
-.metric-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 25px 10px;
-    width: 100%;
-    height: 150px;                    /* 🔥 más cuadradas y largas */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;          /* 🔥 centra vertical */
-    align-items: center;              /* 🔥 centra horizontal */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    text-align: center;               /* 🔥 centra texto */
+  font-size: .70rem;
+  padding: .30rem .55rem;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  font-family: "Open Sans",sans-serif;
+  display: inline-block;
 }
 
-/* Valor grande */
-.metric-value {
-    font-size: 36px;         /* 🔥 más grande */
-    font-weight: 700;
-    color: #303570;                   /* Azul Focusa */
-    line-height: 1;
-    margin-bottom: 6px;
+/*Tabla de tareas especifica*/
+
+.task-card { position: relative; }
+
+.task-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--focusa-gray-light);
+  z-index: 2;
 }
 
-/* Etiqueta */
-.metric-label {
-    font-size: 15px;
-    font-weight: 500;
-    color: #6c757d;
+.task-table tbody tr.overdue td {
+  background: #fff5f5;
 }
 
-/* Contenedor centrado */
-.metric-row {
-    display: flex;
-    justify-content: center;   /* 👉 Centra horizontalmente */
-    align-items: center;       /* 👉 Centra vertical si hace falta */
-    gap: 2rem;                 /* 👉 Espacio entre cards */
-    margin-bottom: 2rem;
-    flex-wrap: wrap;           /* 👉 Para que en móvil no colapsen */
+.task-table tbody tr.overdue .badge.state-por-hacer,
+.task-table tbody tr.overdue .badge.state-en-proceso {
+  box-shadow: 0 0 0 2px #d9364f33;
 }
 
-/* Cards */
-.metric-card {
-    background: #fff;
-    border-radius: 18px;
-    padding: 25px 20px;
-    width: 260px;              /* 👉 Largo uniforme */
-    height: 140px;             /* 👉 Más cuadrada */
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: center;   /* centra el contenido vertical */
-    align-items: center;       /* centra horizontal */
-    text-align: center;
+.task-title { font-weight: 600; }
+.task-title .small { font-weight: 400; }
 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    border: 1px solid #e5e8f0;
+.date-cell span {
+  display: block;
+  font-family: "Roboto Mono", monospace;
+  letter-spacing: .5px;
+}
+.date-cell small {
+  display: block;
+  margin-top: 2px;
 }
 
-/* Valor */
-.metric-value {
-    font-size: 40px;
-    font-weight: 700;
-    color: #303570;
-    line-height: 1;
-    margin-bottom: 6px;
+.progress-thin { position: relative; }
+.progress-thin .progress-bar {
+  transition: width .4s ease;
 }
 
-/* Etiqueta */
-.metric-label {
-    font-size: 20px;
-    font-weight: 600;
-    color: #6c757d;
+.badge.state-por-hacer {
+  background: #fff;
+  color: var(--focusa-dark-alt);
+  border: 1px solid var(--focusa-dark-alt);
 }
+.badge.state-en-proceso { background: var(--focusa-dark-alt); color: #fff; }
+.badge.state-en-revision { background: var(--focusa-dark); color: #fff; }
+.badge.state-completo { background: #34a853; color: #fff; }
+
+/* Badges prioridad */
+.badge.priority-alta { background: #d9364f; color:#fff; }
+.badge.priority-media { background: #ffb347; color:#fff; }
+.badge.priority-baja { background: #8ab4f8; color:#fff; }

@@ -1,37 +1,111 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
+{% endblock %} {% block content %}
 
-{% block content %}
-<h1 class="mb-4">Dashboard</h1>
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-{% endblock %}
-
-<div class="metric-row">
-    
+<div class="row metric-row">
+  <div class="col-md-4">
     <div class="metric-card">
-        <div class="metric-value">{{ resumen.tareas_creadas }}</div>
-        <div class="metric-label">Tareas creadas</div>
+      <div class="metric-value">{{ resumen.tareas_creadas }}</div>
+      <div class="metric-label">Tareas por hacer</div>
     </div>
+  </div>
 
+  <div class="col-md-4">
     <div class="metric-card">
-        <div class="metric-value">{{ resumen.tareas_completadas }}</div>
-        <div class="metric-label">Tareas completadas</div>
+      <div class="metric-value">{{ resumen.tareas_completadas }}</div>
+      <div class="metric-label">Tareas completadas</div>
     </div>
+  </div>
 
+  <div class="col-md-4">
     <div class="metric-card">
-        <div class="metric-value">{{ resumen.productividad_pct }}%</div>
-        <div class="metric-label">Productividad</div>
+      <div class="metric-value">{{ resumen.productividad_pct }}%</div>
+      <div class="metric-label">Productividad</div>
     </div>
+  </div>
+</div>
 
+<div class="row g-4">
+  <!-- Progreso mensual -->
+<div class="col-lg-6">
+  <div class="card h-100">
+    <div class="card-header">Progreso mensual</div>
+    <div class="card-body">
+      <div
+        id="chart-progreso"
+        class="focusa-chart"
+        data-type="area"
+        data-stacked="true"
+        data-height="320"
+        data-labels='{{ meses_json|safe }}'
+        data-series='{{ progreso_series_json|safe }}'
+      ></div>
+    </div>
+  </div>
+</div>
+
+  <!-- Distribución estados (dona) -->
+<div class="col-lg-6">
+  <div class="card h-100">
+    <div class="card-header">Estados de tareas</div>
+    <div class="card-body">
+      <div
+        id="chart-estados"
+        class="focusa-chart"
+        data-type="donut"
+        data-height="320"
+        data-labels='{{ estados_labels_json|safe }}'
+        data-series='{{ estados_values_json|safe }}'
+      ></div>
+    </div>
+  </div>
 </div>
 
 
-    <!-- Tabla detalle tareas -->
+<!-- Prioridades -->
+<div class="col-lg-6">
+  <div class="card h-100">
+    <div class="card-header">Tareas por prioridad</div>
+    <div class="card-body">
+      <div
+        id="chart-prioridades"
+        class="focusa-chart"
+        data-type="donut"
+        data-stacked="true"
+        data-height="340"
+        data-labels='{{ prioridades_labels_json|safe }}'
+        data-series='{{ prioridades_series_json|safe }}'
+      ></div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Productividad por día (heatmap) -->
+<div class="col-lg-6">
+  <div class="card h-100">
+    <div class="card-header">Productividad por día</div>
+    <div class="card-body">
+      <div
+        id="chart-heatmap"
+        class="focusa-chart"
+        data-type="heatmap"
+        data-height="300"
+        data-series='{{ heatmap_json|safe }}'
+      ></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <!-- Tabla detalle tareas -->
   <div class="col-12">
     <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
         <span>Detalle de tareas</span>
         <small class="text-muted">Total: {{ tareas|length }}</small>
       </div>
@@ -51,19 +125,34 @@
             {% for t in tareas %}
             <tr>
               <td>{{ t.titulo }}</td>
-              <td><span class="badge state-{{ t.estado|lower|slugify }}">{{ t.estado }}</span></td>
-              <td><span class="badge priority-{{ t.prioridad|lower }}">{{ t.prioridad }}</span></td>
+              <td>
+                <span class="badge state-{{ t.estado|lower|slugify }}"
+                  >{{ t.estado }}</span
+                >
+              </td>
+              <td>
+                <span class="badge priority-{{ t.prioridad|lower }}"
+                  >{{ t.prioridad }}</span
+                >
+              </td>
               <td>{{ t.fecha_creacion|date:"d/m/Y" }}</td>
               <td>{{ t.fecha_limite|date:"d/m/Y" }}</td>
               <td>
                 <div class="progress progress-thin">
-                  <div class="progress-bar" style="width: {{ t.porcentaje }}%"></div>
+                  <div
+                    class="progress-bar"
+                    style="width: {{ t.porcentaje }}%"
+                  ></div>
                 </div>
                 <small class="text-muted">{{ t.porcentaje }}%</small>
               </td>
             </tr>
             {% empty %}
-            <tr><td colspan="6" class="text-center text-muted py-4">No hay tareas</td></tr>
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                No hay tareas
+              </td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
@@ -71,85 +160,9 @@
     </div>
   </div>
 
-  <!-- Progreso mensual -->
-  <div class="col-lg-6">
-    <div class="card h-100">
-      <div class="card-header">Progreso mensual</div>
-      <div class="card-body">
-        <div id="chart-progreso" class="focusa-chart"
-             data-type="area"
-             data-stacked="true"
-             data-height="320"
-             data-labels='{{ meses_json|safe }}'
-             data-series='{{ progreso_series_json|safe }}'></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Distribución estados (dona) -->
-  <div class="col-lg-6">
-    <div class="card h-100">
-      <div class="card-header">Estados de tareas</div>
-      <div class="card-body">
-        <div id="chart-estados" class="focusa-chart"
-             data-type="donut"
-             data-height="320"
-             data-labels='{{ estados_labels_json|safe }}'
-             data-series='{{ estados_values_json|safe }}'></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Productividad por día (heatmap) -->
-  <div class="col-lg-6">
-    <div class="card h-100">
-      <div class="card-header">Productividad por día</div>
-      <div class="card-body">
-        <div id="chart-heatmap" class="focusa-chart"
-             data-type="heatmap"
-             data-height="300"
-             data-series='{{ heatmap_json|safe }}'></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Progreso proyectos (barras horizontales) -->
-  <div class="col-lg-6">
-    <div class="card h-100">
-      <div class="card-header">Progreso por proyecto</div>
-      <div class="card-body">
-        <div id="chart-proyectos" class="focusa-chart"
-             data-type="bar-horizontal"
-             data-height="300"
-             data-labels='{{ proyectos_labels_json|safe }}'
-             data-series='[
-               {"name":"Completado","data":{{ proyectos_completadas_json|safe }}},
-               {"name":"Pendiente","data":{{ proyectos_pendientes_json|safe }}}
-             ]'></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Prioridades (barras apiladas) -->
-  <div class="col-12">
-    <div class="card h-100">
-      <div class="card-header">Tareas por prioridad</div>
-      <div class="card-body">
-        <div id="chart-prioridades" class="focusa-chart"
-             data-type="bar"
-             data-stacked="true"
-             data-height="340"
-             data-labels='{{ prioridades_labels_json|safe }}'
-             data-series='{{ prioridades_series_json|safe }}'></div>
-      </div>
-    </div>
-  </div>
-
+  {% endblock %} {% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
+  <script src="{% static 'js/focusa-theme.js' %}" defer></script>
+  <script src="{% static 'js/dashboard.js' %}" defer></script>
+  {% endblock %}
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-<script src="{% static 'js/focusa-theme.js' %}" defer></script>
-<script src="{% static 'js/dashboard.js' %}" defer></script>
-{% endblock %}
