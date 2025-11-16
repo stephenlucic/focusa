@@ -9,135 +9,110 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="mb-0">Perfil</h2>
-</div>
-<div class="container-fluid py-4">
-  <div class="row g-4">
-    <!-- Icono de perfil -->
-    <div class="col-12 col-lg-3">
-      <div class="card shadow-sm border-0">
-        <div class="card-body text-center">
-          <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width:96px;height:96px;">
-            <img src="{% static 'img/foto_perfil_foca.jpg' %}" 
-                 class="img-fluid w-100 h-100 object-fit-cover" 
-                 alt="avatar">
-          </div>
-          <h6 class="mb-0 fw-semibold">
-            {{ perfil.first_name }} {{ perfil.last_name }}
-          </h6>
-        </div>
-      </div>
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }} perfil-alert d-flex justify-content-between align-items-center px-3 py-2 mb-3">
+      <span>{{ m.message }}</span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
+  {% endfor %}
+{% endif %}
 
-    <!-- Card del Formulario -->
-    <div class="col-12 col-lg-9">
-      <div class="card shadow-sm border-0">
-        <div class="card-body">
-          <h5 class="card-title mb-4 fw-semibold">Datos de perfil</h5>
-          
-          <form id="perfil-form" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label fw-medium">Nombres</label>
-                <input name="first_name" 
-                       class="form-control form-control-lg bg-light" 
-                       value="{{ perfil.first_name }}" 
-                       disabled>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-medium">Apellidos</label>
-                <input name="last_name" 
-                       class="form-control form-control-lg bg-light" 
-                       value="{{ perfil.last_name }}" 
-                       disabled>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-medium">Correo</label>
-                <input name="email" 
-                       type="email"
-                       class="form-control form-control-lg bg-light" 
-                       value="{{ perfil.email }}" 
-                       disabled>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-medium">Teléfono</label>
-                <input name="mobile" 
-                       class="form-control form-control-lg bg-light" 
-                       value="{{ perfil.mobile }}" 
-                       disabled>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-medium">Género</label>
-                <select name="gender" class="form-select form-select-lg bg-light" disabled>
-                  <option value="male" {% if perfil.gender == 'male' %}selected{% endif %}>Masculino</option>
-                  <option value="female" {% if perfil.gender == 'female' %}selected{% endif %}>Femenino</option>
-                  <option value="other" {% if perfil.gender == 'other' %}selected{% endif %}>Otro</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-medium">País</label>
-                <input name="tax_country" 
-                       class="form-control form-control-lg bg-light" 
-                       value="{{ perfil.tax_country }}" 
-                       disabled>
-              </div>
-            </div>
-
-            <div class="mt-4 d-flex gap-2">
-              <button type="button" id="edit-btn" class="btn btn-primary btn-lg px-3">
-                <i class="bi bi-pencil-square me-2"></i>Editar
-              </button>
-              <div id="action-buttons" class="d-none">
-                <button type="submit" id="save-btn" class="btn btn-success btn-lg px-3">
-                  <i class="bi bi-check-lg me-2"></i>Guardar
-                </button>
-                <button type="button" id="cancel-btn" class="btn btn-danger btn-lg px-3">
-                  <i class="bi bi-x-lg me-2"></i>Cancelar
-                </button>
-              </div>
-            </div>
-          </form>
+<div class="card shadow-sm profile-card">
+  <div class="card-body">
+    <div class="row g-4 align-items-start profile-layout">
+      
+      <!-- Col izquierda -->
+      <div class="col-12 col-lg-4">
+        <div class="text-center">
+          <div class="profile-avatar mb-3">
+            <img src="{% static 'img/foto_perfil_foca.jpg' %}" alt="Foto de perfil">
+          </div>
+          <h5 class="mb-1">{{ request.user.first_name }} {{ request.user.last_name }}</h5>
+          <div class="text-muted small">{{ request.user.email }}</div>
+          <div class="text-muted small">{{ request.user.username }}</div>
         </div>
       </div>
+
+      <!-- Divisor -->
+      <div class="col-lg-auto d-none d-lg-flex">
+        <div class="profile-divider-vertical"></div>
+      </div>
+
+      <!-- Col derecha -->
+      <div class="col-12 col-lg-7">
+        <form id="perfil-form" method="post" class="py-2">
+          {% csrf_token %}
+          <div class="row g-4">
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Nombre</label>
+              <input name="first_name" class="form-control" value="{{ request.user.first_name }}">
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Apellido</label>
+              <input name="last_name" class="form-control" value="{{ request.user.last_name }}">
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Teléfono</label>
+              <input name="telefono" class="form-control" value="{{ perfil.telefono }}">
+            </div>
+            <div class="col-12 col-lg-6">
+              <label class="form-label">Ocupación</label>
+              <input name="ocupacion" class="form-control" value="{{ perfil.ocupacion }}">
+            </div>
+            <div class="col-12 col-lg-3">
+              <label class="form-label">Género</label>
+              <select name="genero" class="form-select">
+                <option value="">Selecciona…</option>
+                <option value="M" {% if perfil.genero == "M" %}selected{% endif %}>Masculino</option>
+                <option value="F" {% if perfil.genero == "F" %}selected{% endif %}>Femenino</option>
+                <option value="O" {% if perfil.genero == "O" %}selected{% endif %}>Otro</option>
+                <option value="N" {% if perfil.genero == "N" %}selected{% endif %}>Prefiero no decir</option>
+              </select>
+            </div>
+            <div class="col-12 col-lg-3">
+              <label class="form-label">País</label>
+              <input name="pais" class="form-control" value="{{ perfil.pais }}">
+            </div>
+          </div>
+          <div id="action-buttons" class="mt-4">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('perfil-form');
-    const editBtn = document.getElementById('edit-btn');
-    const actionButtons = document.getElementById('action-buttons');
-    const cancelBtn = document.getElementById('cancel-btn');
-    const campos = form.querySelectorAll('input, select');
-    
-    const valoresIniciales = {};
-    campos.forEach(campo => {
-        valoresIniciales[campo.name] = campo.value;
-    });
+(function(){
+  const form = document.getElementById('perfil-form');
+  if(!form) return;
 
-    editBtn.addEventListener('click', function() {
-        campos.forEach(campo => {
-            campo.disabled = false;
-            campo.classList.remove('bg-light');
-        });
-        editBtn.classList.add('d-none');
-        actionButtons.classList.remove('d-none');
-        actionButtons.classList.add('d-flex', 'gap-2');
-    });
-
-    cancelBtn.addEventListener('click', function() {
-        campos.forEach(campo => {
-            campo.value = valoresIniciales[campo.name];
-            campo.disabled = true;
-            campo.classList.add('bg-light');
-        });
-        actionButtons.classList.add('d-none');
-        actionButtons.classList.remove('d-flex', 'gap-2');
-        editBtn.classList.remove('d-none');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    Swal.fire({
+      title: '¿Guardar cambios?',
+      text: 'Se actualizará tu perfil.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, guardar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      focusCancel: true
+    }).then((result) => {
+      if(result.isConfirmed){
+        form.submit();
+      }
     });
   });
+})();
 </script>
 {% endblock %}
