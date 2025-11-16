@@ -1,0 +1,132 @@
+/* ================================
+   Focusa – varibles y estilos base
+   ================================ */
+
+/* Paleta base + index */
+:root {
+  --focusa-dark-blue: #303570;
+  --focusa-dark: #3B4178;
+  --focusa-medium-blue: #606593;
+  --focusa-lightest-blue: #F7F8FA;
+
+  --focusa-text: #142127;
+  --focusa-muted: #6b7a86;
+  --focusa-bg: #f7fafc;
+
+  /* Solo lo que usamos de Bootstrap */
+  --bs-font-sans-serif: "Open Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Tipografía global */
+html, body {
+  font-family: var(--bs-font-sans-serif);
+}
+
+/* Utilidad usada por varias secciones */
+.section { padding: 4rem 0; }
+
+/* Text helpers usados en index */
+.text-focusa { color: var(--focusa-medium-blue) !important; }
+.text-focusa-dark { color: var(--focusa-dark) !important; }
+.text-secondary { color: var(--focusa-muted) !important; }
+
+/* ================================
+   Header navegacion base
+   ================================ */
+.header-center .header-menu { gap: 5rem; }
+
+.header-center .nav-link {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-weight: 600;
+  color: var(--focusa-text);
+  padding: .75rem 0;
+  transition: color .2s ease;
+}
+
+.header-center .nav-link:hover,
+.header-center .nav-link:focus,
+.header-center .nav-link.active {
+  color: var(--focusa-dark-blue);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.header-center .container.py-3 {
+  padding-top: 1.8rem !important;
+  padding-bottom: 1.0rem !important;
+}
+
+
+/* --- Botón Focusa Outline (Iniciar sesión) --- */
+.btn-outline-focusa2 {
+  background: transparent;
+  color: #3B4178;               /* morado Focusa */
+  border: 2px solid #3B4178;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.btn-outline-focusa2:hover {
+  background: rgba(59, 65, 120, 0.10); /* leve fondo morado */
+  color: #3B4178;
+  border-color: #3B4178;
+}
+
+
+/* --- Botón Focusa sólido (Registrarse) --- */
+.btn-focusa2 {
+  background: #3B4178;
+  color: #fff !important;
+  border: 2px solid #3B4178;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.btn-focusa2:hover {
+  background: #5E6391;        /* morado más claro */
+  border-color: #5E6391;
+  color: #fff !important;
+}
+
+/* Ícono blanco dentro del botón Registrarse */
+.btn-focusa2 i {
+  color: #fff !important;
+  font-size: 1rem;
+}
+
+/* ================================
+   Panel
+   ================================ */
+.hero { background: linear-gradient(180deg, #fff 0%, #f3f7fb 100%); }
+.rounded-2xl { border-radius: 1.25rem; }
+.shadow-soft { box-shadow: 0 10px 30px rgba(44, 112, 184, .08); } /* sombra suave azul */
+
+
+/* ================================
+   Componentes index
+   ================================ */
+.feature-card,
+.news-card {
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 16px;
+  padding: 24px;
+  transition: transform .15s ease;
+}
+.feature-card:hover, .news-card:hover { transform: translateY(-3px); }
+
+/*Visuales index */
+.bg-light { background-color: var(--focusa-bg) !important; }
+.border { border-color: var(--focusa-lightest-blue) !important; }
+
+/* ================================
+   Footer (base)
+   ================================ */
+.footer { background-color: var(--focusa-medium-blue); }
+.footer, .footer p, .footer span { color: #e9ecef; }
+.footer h6 { color: #fff; }
+.footer a { color: #f8f9fa; text-decoration: none; }
+.footer a:hover { color: #fff; text-decoration: underline; }
