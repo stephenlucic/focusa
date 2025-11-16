@@ -70,7 +70,7 @@
       <div
         id="chart-prioridades"
         class="focusa-chart"
-        data-type="donut"
+        data-type="pie"
         data-stacked="true"
         data-height="340"
         data-labels='{{ prioridades_labels_json|safe }}'
@@ -87,17 +87,16 @@
     <div class="card-header">Productividad por día</div>
     <div class="card-body">
       <div
-        id="chart-heatmap"
+        id="chart-productividad"
         class="focusa-chart"
-        data-type="heatmap"
+        data-type="bar"
         data-height="300"
-        data-series='{{ heatmap_json|safe }}'
+        data-labels='{{ productividad_labels_json|safe }}'
+        data-series='{{ productividad_series_json|safe }}'
       ></div>
     </div>
   </div>
 </div>
-
-
 
 
   <!-- Tabla detalle tareas -->

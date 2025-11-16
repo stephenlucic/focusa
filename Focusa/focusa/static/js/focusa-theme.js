@@ -1,6 +1,13 @@
 const focusaTheme = {
-    colors: ['#2C70B8', '#FED700', '#303570', '#0C9C67', '#EF3942'],
-
+    colors: [
+        "#2C70B8", // Azul principal
+        "#7FAFDD", // Azul suave
+        "#303570", // Azul oscuro
+        "#FFC048", // Amarillo suave
+        "#4CAF50", // Verde éxito
+        "#E6455C"  // Rojo prioridad alta
+    ],
+    
     chart: {
       toolbar: { show: false },
       zoom: { enabled: false },
@@ -52,3 +59,4 @@ const focusaTheme = {
       style: { fontSize: '12px', fontFamily: 'Open Sans, sans-serif' }
     }
 };
+

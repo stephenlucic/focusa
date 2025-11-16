@@ -7,23 +7,19 @@ def dashboard(request):
     meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"]
     creadas = [40,32,38,50,46,55,62,58,60,65,70,68]
     completadas = [30,28,35,42,40,49,55,53,57,60,66,64]
-    
+
 
     estados_labels = ["Por hacer","En proceso","En revisión","Completo"]
     estados_values = [18, 9, 6, 34]
-
-    heatmap = [
-        {"name": "Productividad", "data": [
-            {"x": "Lun", "y": 22},
-            {"x": "Mar", "y": 17},
-            {"x": "Mié", "y": 19},
-            {"x": "Jue", "y": 12},
-            {"x": "Vie", "y": 16},
-            {"x": "Sáb", "y": 11},
-            {"x": "Dom", "y": 8},
-        ]}
-    ]
     
+
+    productividad_labels = ["Semana 1", "Semana 2", "Semana 3", "Semana 4"]
+    productividad_series = [
+    {"name": "Creadas", "data": [50, 45, 60, 55]},
+    {"name": "Por hacer", "data": [10, 12, 8, 15]},
+    {"name": "En proceso", "data": [15, 18, 20, 12]},
+    {"name": "En revisión", "data": [5, 7, 6, 9]},
+    {"name": "Completadas", "data": [40, 38, 50, 48]}]
 
     resumen = {
         "tareas_creadas": 65,
@@ -74,7 +70,8 @@ def dashboard(request):
         ]),
         "estados_labels_json": json.dumps(estados_labels),
         "estados_values_json": json.dumps(estados_values),
-        "heatmap_json": json.dumps(heatmap),
+        "productividad_labels_json": json.dumps(productividad_labels),
+        "productividad_series_json": json.dumps(productividad_series),
         "resumen": resumen,
         "tareas": tareas,
         "prioridades_labels_json": json.dumps(prioridades_labels),

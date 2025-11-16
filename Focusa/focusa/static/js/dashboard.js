@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
       colors: focusaTheme.colors.slice(0, Math.max(series.length || 1, 1)),
       dataLabels: { enabled: false },
       grid: { strokeDashArray: 4 },
-      legend: { position: 'top', horizontalAlign: 'right' }
+      legend: { position: 'top', horizontalAlign: 'right', markers: { radius: 10 } }
     };
 
     if (type === 'area') {
@@ -25,18 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
 
-    if (type === 'bar') {
-      return {
-        ...base,
-        chart: { ...base.chart, stacked },
-        series,
-        xaxis: { ...focusaTheme.xaxis, categories: labels },
-        plotOptions: {
-          bar: { horizontal: false, columnWidth: '55%', borderRadius: 6, borderRadiusApplication: 'end' }
-        },
-        yaxis: { labels: { style: focusaTheme.xaxis.labels.style } }
-      };
-    }
+// ...existing code...
+if (type === 'bar') {
+  return {
+    ...base,
+    chart: { ...base.chart, stacked },
+    series,
+    xaxis: { ...focusaTheme.xaxis, categories: labels },
+    plotOptions: {
+      bar: { horizontal: false, columnWidth: '55%', borderRadius: 6, borderRadiusApplication: 'end' }
+    },
+    yaxis: { labels: { style: focusaTheme.xaxis.labels.style } },
+    legend: { ...base.legend, markers: { shape: 'circle', radius: 5 } }  // <-- añade esto
+  };
+}
+// ...existing code...
 
     if (type === 'bar-horizontal') {
       return {
@@ -127,21 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       case 'chart-prioridades':
         // Alta, Media, Baja (igual que tus badges)
-        options.colors = ['#D9364F', '#FFB347', '#8AB4F8'];
+        options.colors = ['#E6455C', '#FFC048', '#7FAFDD'];
         break;
 
       case 'chart-heatmap':
         // si quieres un gradiente más suave
-        options.plotOptions.heatmap.colorScale.ranges = [
-          { from: 0,  to: 10, color: '#8AB4F8', name: 'Bajo'  },
-          { from: 11, to: 18, color: '#2C70B8', name: 'Medio' },
-          { from: 19, to: 30, color: '#303570', name: 'Alto'  }
-        ];
         break;
 
-      default:
-        // otros gráficos usan la paleta base de focusaTheme
-        break;
     }
 
     new ApexCharts(el, options).render();
