@@ -129,3 +129,17 @@ def tarea_detalle_actualizar(request, pk):
         "tag_id": tarea.tag_id,
     }
     return JsonResponse({"ok": True, "tarea": data})
+
+@require_POST
+@login_required
+def eliminar_tarea(request, pk):
+    tarea = get_object_or_404(Tarea, pk=pk, responsable=request.user)
+    tarea.delete()
+    return JsonResponse({"ok": True})
+
+@require_POST
+@login_required
+def eliminar_tag(request, pk):
+    tag = get_object_or_404(Tag, pk=pk)
+    tag.delete()  # on_delete SET_NULL en tareas
+    return JsonResponse({"ok": True})

@@ -36,6 +36,7 @@
           <div class="kanban-body">
             {% for tarea in tareas_todo %}
               <div class="kanban-card task-card" data-id="{{ tarea.id }}">
+                <div class="task-delete-btn" data-id="{{ tarea.id }}" title="Eliminar">&times;</div>
                 <div class="card-title d-flex align-items-center gap-2">
                   {% if tarea.prioridad == "alta" %}
                     <span class="task-priority priority-high"></span>
@@ -66,7 +67,7 @@
                 </div>
               </div>
             {% empty %}
-              <p class="text-muted small mb-0">No hay tareas por hacer.</p>
+              <p class="text-muted small mb-0 empty-msg">No hay tareas por hacer.</p>
             {% endfor %}
           </div>
         </div>
@@ -82,6 +83,7 @@
           <div class="kanban-body">
             {% for tarea in tareas_progress %}
               <div class="kanban-card task-card" data-id="{{ tarea.id }}">
+                <div class="task-delete-btn" data-id="{{ tarea.id }}" title="Eliminar">&times;</div>
                 <div class="card-title d-flex align-items-center gap-2">
                   {% if tarea.prioridad == "alta" %}
                     <span class="task-priority priority-high"></span>
@@ -112,7 +114,7 @@
                 </div>
               </div>
             {% empty %}
-              <p class="text-muted small mb-0">No hay tareas en progreso.</p>
+              <p class="text-muted small mb-0 empty-msg">No hay tareas en progreso.</p>
             {% endfor %}
           </div>
         </div>
@@ -128,6 +130,7 @@
           <div class="kanban-body">
             {% for tarea in tareas_review %}
               <div class="kanban-card task-card" data-id="{{ tarea.id }}">
+                <div class="task-delete-btn" data-id="{{ tarea.id }}" title="Eliminar">&times;</div>
                 <div class="card-title d-flex align-items-center gap-2">
                   {% if tarea.prioridad == "alta" %}
                     <span class="task-priority priority-high"></span>
@@ -158,7 +161,7 @@
                 </div>
               </div>
             {% empty %}
-              <p class="text-muted small mb-0">No hay tareas en revisión.</p>
+              <p class="text-muted small mb-0 empty-msg">No hay tareas en revisión.</p>
             {% endfor %}
           </div>
         </div>
@@ -174,6 +177,7 @@
           <div class="kanban-body">
             {% for tarea in tareas_done %}
               <div class="kanban-card task-card" data-id="{{ tarea.id }}">
+                <div class="task-delete-btn" data-id="{{ tarea.id }}" title="Eliminar">&times;</div>
                 <div class="card-title d-flex align-items-center gap-2">
                   {% if tarea.prioridad == "alta" %}
                     <span class="task-priority priority-high"></span>
@@ -204,7 +208,7 @@
                 </div>
               </div>
             {% empty %}
-              <p class="text-muted small mb-0">No hay tareas completadas.</p>
+              <p class="text-muted small mb-0 empty-msg">No hay tareas completadas.</p>
             {% endfor %}
           </div>
         </div>
@@ -531,12 +535,38 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.drop-indicator').forEach(indicator => indicator.remove());
     }
 
+    function refreshEmptyMessages() {
+        document.querySelectorAll('.kanban-column').forEach(column => {
+            const body = column.querySelector('.kanban-body');
+            const hasTask = !!body.querySelector('.kanban-card');
+            let emptyMsg = body.querySelector('.empty-msg');
+            // si no hay mensaje y no hay tareas, crearlo (caso columna quedó vacía por drag/delete)
+            if (!emptyMsg && !hasTask) {
+                emptyMsg = document.createElement('p');
+                emptyMsg.className = 'text-muted small mb-0 empty-msg';
+                const status = column.getAttribute('data-status');
+                const textos = {
+                    todo: 'No hay tareas por hacer.',
+                    progress: 'No hay tareas en progreso.',
+                    review: 'No hay tareas en revisión.',
+                    done: 'No hay tareas completadas.'
+                };
+                emptyMsg.textContent = textos[status] || 'Sin tareas.';
+                body.appendChild(emptyMsg);
+            }
+            if (emptyMsg) {
+                emptyMsg.style.display = hasTask ? 'none' : 'block';
+            }
+        });
+    }
+
     function updateTaskCounts() {
         document.querySelectorAll('.kanban-column').forEach(column => {
             const count = column.querySelectorAll('.kanban-card').length;
             const counter = column.querySelector('.task-count');
             if (counter) counter.textContent = count;
         });
+        refreshEmptyMessages();
     }
 
     makeCardsDraggable();
@@ -574,9 +604,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setFormEditable(false);
 
     taskCards.forEach(card => {
-        card.addEventListener('click', function() {
+        card.addEventListener('click', function(e) {
             if (this.classList.contains('dragging')) return;
-
+            if (e.target.closest('.task-delete-btn')) return;
             const taskId = this.getAttribute('data-id');
             if (!taskId || !taskDetailModal) return;
 
@@ -656,6 +686,60 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // --- eliminación (reemplazado con SweetAlert2) ---
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.task-delete-btn');
+        if (!btn) return;
+        e.stopImmediatePropagation();
+        const card = btn.closest('.kanban-card');
+        const id = btn.getAttribute('data-id');
+        if (!id) return;
+
+        Swal.fire({
+            title: '¿Eliminar la tarea?',
+            text: 'Esta acción no se puede deshacer.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            fetch(`{% url 'kanban_tarea_eliminar' 0 %}`.replace('/0/', `/${id}/`), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            }).then(r => r.json()).then(data => {
+                if (data.ok) {
+                    card.remove();
+                    updateTaskCounts(); // refresca mensaje vacío
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Tarea eliminada',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.error || 'No se pudo eliminar la tarea.'
+                    });
+                }
+            }).catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de red',
+                    text: 'Inténtalo nuevamente.'
+                });
+            });
+        });
+    });
 });
 </script>
 {% endblock %}

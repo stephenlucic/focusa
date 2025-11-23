@@ -84,7 +84,7 @@
 .task-priority {
   width: 12px;
   height: 12px;
-  border-radius: 2px;
+  border-radius: 50%; /* antes 2px: ahora círculo */
   display: inline-block;
 }
 
@@ -109,6 +109,31 @@
   font-size: 0.75rem;
   color: #6c757d;
   font-weight: 500;
+}
+
+.task-card {
+  position: relative;
+}
+
+.task-delete-btn {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6c757d;          /* plomo */
+  background: transparent; /* sin aro */
+  padding: 0 4px;
+  line-height: 1;
+  font-weight: 600;
+  border: none;
+  box-shadow: none;
+}
+
+.task-delete-btn:hover {
+  color: #dc3545;    /* rojo al hover */
+  font-weight: 700;  /* un poco más gruesa */
+  transform: scale(1.1);
 }
 
 /* Columnas con colores específicos */
@@ -137,4 +162,20 @@
 
 .tablero-card{
     border: 1px solid #e9ecef;  /* opcional: borde sutil */
+}
+
+.tag-admin-badge {
+  position: relative;
+  font-size: 0.7rem;
+  padding: 6px 8px;
+}
+.tag-admin-badge .tag-admin-delete {
+  cursor: pointer;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  line-height: 1;
+}
+.tag-admin-badge .tag-admin-delete:hover {
+  color: #fff;
+  text-shadow: 0 0 2px rgba(0,0,0,0.4);
 }
