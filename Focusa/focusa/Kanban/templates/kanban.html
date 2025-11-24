@@ -56,6 +56,7 @@
                   <div class="d-flex align-items-center gap-2">
                     {% if tarea.tag %}
                       <span class="badge rounded-pill"
+                            data-tag-id="{{ tarea.tag.id }}"
                             style="background-color: {{ tarea.tag.color }};">
                         {{ tarea.tag.nombre }}
                       </span>
@@ -103,6 +104,7 @@
                   <div class="d-flex align-items-center gap-2">
                     {% if tarea.tag %}
                       <span class="badge rounded-pill"
+                            data-tag-id="{{ tarea.tag.id }}"
                             style="background-color: {{ tarea.tag.color }};">
                         {{ tarea.tag.nombre }}
                       </span>
@@ -150,6 +152,7 @@
                   <div class="d-flex align-items-center gap-2">
                     {% if tarea.tag %}
                       <span class="badge rounded-pill"
+                            data-tag-id="{{ tarea.tag.id }}"
                             style="background-color: {{ tarea.tag.color }};">
                         {{ tarea.tag.nombre }}
                       </span>
@@ -197,6 +200,7 @@
                   <div class="d-flex align-items-center gap-2">
                     {% if tarea.tag %}
                       <span class="badge rounded-pill"
+                            data-tag-id="{{ tarea.tag.id }}"
                             style="background-color: {{ tarea.tag.color }};">
                         {{ tarea.tag.nombre }}
                       </span>
@@ -305,26 +309,39 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
-        <!-- IMPORTANTE: method="post" y csrf_token -->
         <form id="newTagForm" method="post">
           {% csrf_token %}
-          <input type="hidden" name="action" value="create_tag">
+          <input type="hidden" name="action" value="create_tag" id="tagFormAction">
+          <input type="hidden" name="tag_id" id="tagFormId">
           <div class="mb-3">
             <label for="tagName" class="form-label">Nombre del tag</label>
-            <input type="text" class="form-control" id="tagName" name="name" placeholder="Ej: Backend, Urgente, Diseño" required>
+            <input type="text" class="form-control" id="tagName" name="name" placeholder="Ej: Diseño, Backend" required>
           </div>
-
           <div class="mb-3">
             <label for="tagColor" class="form-label">Color</label>
-            <input type="color" class="form-control form-control-color" id="tagColor" name="color" value="#0d6efd" title="Elige un color para el tag">
+            <input type="color" class="form-control form-control-color" id="tagColor" name="color" value="#0d6efd">
           </div>
+        </form>
+
+        <hr class="my-3">
+        <h6 class="mb-2">Tags existentes</h6>
+        <div id="tagAdminList" class="d-flex flex-wrap gap-2">
+          {% for tag in tags %}
+            <span class="badge tag-admin-badge d-flex align-items-center gap-1"
+                  style="background-color: {{ tag.color }};"
+                  data-tag-id="{{ tag.id }}">
+              <span>{{ tag.nombre }}</span>
+              <span class="tag-admin-delete" data-id="{{ tag.id }}" title="Eliminar">&times;</span>
+            </span>
+          {% empty %}
+            <p class="text-muted small mb-0"></p>
+          {% endfor %}
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <!-- botón submit real del form -->
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        {% comment %} <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button> {% endcomment %}
+        <button type="submit" form="newTagForm" class="btn btn-primary" id="tagSubmitBtn">Guardar</button>
       </div>
-        </form>
     </div>
   </div>
 </div>
@@ -400,7 +417,7 @@
         <div id="taskDetailError" class="text-danger small mt-2" style="display:none;"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        {% comment %} <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button> {% endcomment %}
         <button type="button" class="btn btn-outline-primary" id="editTaskDetailBtn">Editar</button>
         <button type="button" class="btn btn-primary" id="saveTaskDetailBtn" disabled>Guardar cambios</button>
       </div>
@@ -656,12 +673,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (saveBtn) {
         saveBtn.addEventListener('click', function() {
-            if (saveBtn.disabled) return; // no hacer nada si está en modo solo lectura
+            if (saveBtn.disabled) return;
             const taskId = document.getElementById('detailTaskId').value;
             if (!taskId) return;
-
             const formData = new FormData(formEl);
-
             fetch(`{% url 'kanban_tarea_detalle' 0 %}`.replace('/0/', `/${taskId}/`), {
                 method: 'POST',
                 headers: {
@@ -671,7 +686,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             })
             .then(resp => resp.json())
-            .then(data => {
+            .then(data => {            // <-- corregido
                 if (!data.ok) {
                     document.getElementById('taskDetailError').textContent = data.error || 'Error al guardar los cambios.';
                     document.getElementById('taskDetailError').style.display = 'block';
@@ -739,6 +754,238 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
         });
+    });
+
+    document.getElementById('tagAdminList')?.addEventListener('click', function(e){
+        const del = e.target.closest('.tag-admin-delete');
+        if(!del) return;
+        const id = del.getAttribute('data-id');
+        const badge = del.closest('.tag-admin-badge');
+        Swal.fire({
+            title: '¿Eliminar tag?',
+            text: 'Las tareas perderán este tag.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d'
+        }).then(r=>{
+            if(!r.isConfirmed) return;
+            fetch(`{% url 'kanban_tag_eliminar' 0 %}`.replace('/0/', `/${id}/`), {
+                method: 'POST',
+                headers:{
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With':'XMLHttpRequest'
+                }
+            }).then(resp=>resp.json()).then(data=>{
+                if(data.ok){
+                    // 1. quitar badge del modal
+                    badge.remove();
+                    // 2. quitar opciones de selects
+                    document.querySelectorAll(`#taskTag option[value="${id}"], #detailTaskTag option[value="${id}"]`).forEach(o=>o.remove());
+                    // 3. quitar badges en las cards del tablero
+                    document.querySelectorAll(`.kanban-card [data-tag-id="${id}"]`).forEach(b=>b.remove());
+                    // 4. refrescar disponibilidad (mensaje si quedó vacío)
+                    refreshTagAvailability();
+                    Swal.fire({icon:'success', title:'Tag eliminado', timer:1000, showConfirmButton:false});
+                } else {
+                    Swal.fire({icon:'error', title:'Error', text:data.error || 'No se pudo eliminar.'});
+                }
+            }).catch(()=> Swal.fire({icon:'error', title:'Error de red'}));
+        });
+    });
+
+    function refreshTagAvailability() {
+        const tagAdminList = document.getElementById('tagAdminList');
+        const taskTagSelect   = document.getElementById('taskTag');
+        const detailTagSelect = document.getElementById('detailTaskTag');
+        if (!tagAdminList) return;
+
+        const badges = tagAdminList.querySelectorAll('.tag-admin-badge');
+        let msg = tagAdminList.querySelector('.no-tags-msg');
+
+        if (badges.length === 0) {
+            if (!msg) {
+                msg = document.createElement('p');
+                msg.className = 'text-muted small mb-0 no-tags-msg';
+                msg.textContent = 'No hay tags disponibles.';
+                tagAdminList.appendChild(msg);
+            }
+            // Actualizar selects
+            [taskTagSelect, detailTagSelect].forEach(sel => {
+                if (!sel) return;
+                // eliminar todas las opciones excepto la primera (placeholder)
+                sel.querySelectorAll('option[value]:not([value=""])').forEach(o => o.remove());
+                const first = sel.querySelector('option[value=""]');
+                if (first) first.textContent = 'No hay tags disponibles';
+            });
+            // Quitar badges en cards (por seguridad si algún quedó)
+            document.querySelectorAll('.kanban-card .badge[data-tag-id]').forEach(b => b.remove());
+        } else {
+            if (msg) msg.remove();
+            // restaurar texto del placeholder si había cambiado
+            [taskTagSelect, detailTagSelect].forEach(sel => {
+                if (!sel) return;
+                const first = sel.querySelector('option[value=""]');
+                if (first && first.textContent.includes('No hay tags')) {
+                    first.textContent = sel.id === 'taskTag' ? 'Selecciona un tag' : 'Sin tag';
+                }
+            });
+        }
+    }
+
+    refreshTagAvailability();
+
+
+    const tagForm       = document.getElementById('newTagForm');
+    const tagNameInput  = document.getElementById('tagName');
+    const tagColorInput = document.getElementById('tagColor');
+    const tagActionInput= document.getElementById('tagFormAction');
+    const tagIdInput    = document.getElementById('tagFormId');
+    const tagSubmitBtn  = document.getElementById('tagSubmitBtn');
+    let editingBadge = null;
+    let cancelEditBtn = null;
+
+    function setTagFormMode(mode) {
+        if (mode === 'edit') {
+            document.getElementById('newTagModalLabel').textContent = 'Editar Tag';
+            tagSubmitBtn.textContent = 'Actualizar';
+            if (!cancelEditBtn) {
+                cancelEditBtn = document.createElement('button');
+                cancelEditBtn.type = 'button';
+                cancelEditBtn.className = 'btn btn-outline-secondary me-2';
+                cancelEditBtn.id = 'cancelTagEditBtn';
+                cancelEditBtn.textContent = 'Cancelar edición';
+                tagSubmitBtn.parentElement.insertBefore(cancelEditBtn, tagSubmitBtn);
+                cancelEditBtn.addEventListener('click', () => exitTagEditMode());
+            }
+        } else {
+            document.getElementById('newTagModalLabel').textContent = 'Nuevo Tag';
+            tagSubmitBtn.textContent = 'Guardar';
+            tagActionInput.value = 'create_tag';
+            tagIdInput.value = '';
+            tagNameInput.value = '';
+            tagColorInput.value = '#0d6efd';
+            if (editingBadge) {
+                editingBadge.classList.remove('editing');
+                editingBadge = null;
+            }
+            if (cancelEditBtn) {
+                cancelEditBtn.remove();
+                cancelEditBtn = null;
+            }
+        }
+    }
+
+    function exitTagEditMode() {
+        setTagFormMode('create');
+    }
+
+    // Click en badge para entrar en modo edición
+    document.getElementById('tagAdminList')?.addEventListener('click', function(e){
+        const delBtn = e.target.closest('.tag-admin-delete');
+        if (delBtn) return; // eliminación ya manejada
+        const badge = e.target.closest('.tag-admin-badge');
+        if (!badge) return;
+
+        // Preparar edición
+        editingBadge && editingBadge.classList.remove('editing');
+        editingBadge = badge;
+        editingBadge.classList.add('editing');
+        const id = badge.getAttribute('data-tag-id');
+        const nombreActual = badge.querySelector('span:not(.tag-admin-delete)')?.textContent.trim();
+        const colorActual = badge.style.backgroundColor;
+
+        function rgbToHex(rgb){
+            const m = rgb.match(/\d+/g);
+            if(!m) return '#0d6efd';
+            return '#' + m.slice(0,3).map(x => {
+                const h = parseInt(x).toString(16);
+                return h.length === 1 ? '0'+h : h;
+            }).join('');
+        }
+        const colorHex = colorActual.startsWith('#') ? colorActual : rgbToHex(colorActual);
+
+        tagActionInput.value = 'update_tag';
+        tagIdInput.value = id;
+        tagNameInput.value = nombreActual || '';
+        tagColorInput.value = colorHex;
+        setTagFormMode('edit');
+        tagNameInput.focus();
+    });
+
+    // Submit del formulario (crear o actualizar)
+    tagForm?.addEventListener('submit', function(e){
+        e.preventDefault();
+        const mode = tagActionInput.value === 'update_tag' ? 'edit' : 'create';
+        const name = tagNameInput.value.trim();
+        const color = tagColorInput.value.trim() || '#0d6efd';
+        if (!name) return;
+
+        if (mode === 'create') {
+            fetch(`{% url 'kanban_tag_crear' %}`, {
+                method: 'POST',
+                headers:{
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With':'XMLHttpRequest',
+                    'Content-Type':'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ nombre:name, color:color })
+            }).then(r=>r.json()).then(data=>{
+                if(!data.ok){
+                    Swal.fire({icon:'error', title:'Error', text:data.error || 'No se pudo crear.'});
+                    return;
+                }
+                const badge = document.createElement('span');
+                badge.className = 'badge tag-admin-badge d-flex align-items-center gap-1';
+                badge.style.backgroundColor = data.color;
+                badge.setAttribute('data-tag-id', data.id);
+                badge.innerHTML = `<span>${data.nombre}</span><span class="tag-admin-delete" data-id="${data.id}" title="Eliminar">&times;</span>`;
+                document.getElementById('tagAdminList').appendChild(badge);
+                ['taskTag','detailTaskTag'].forEach(selId=>{
+                    const sel = document.getElementById(selId);
+                    if(!sel) return;
+                    const opt = document.createElement('option');
+                    opt.value = data.id;
+                    opt.textContent = data.nombre;
+                    sel.appendChild(opt);
+                });
+                refreshTagAvailability();
+                Swal.fire({icon:'success', title:'Tag creado', timer:900, showConfirmButton:false});
+                exitTagEditMode();
+            }).catch(()=> Swal.fire({icon:'error', title:'Error de red'}));
+        } else {
+            const id = tagIdInput.value;
+            fetch(`{% url 'kanban_tag_actualizar' 0 %}`.replace('/0/', `/${id}/`), {
+                method:'POST',
+                headers:{
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With':'XMLHttpRequest'
+                },
+                body: new URLSearchParams({ nombre:name, color:color })
+            }).then(r=>r.json()).then(data=>{
+                if(!data.ok){
+                    Swal.fire({icon:'error', title:'Error', text:data.error || 'No se pudo actualizar.'});
+                    return;
+                }
+                // Actualizar badge
+                if (editingBadge) {
+                    editingBadge.style.backgroundColor = data.color;
+                    editingBadge.querySelector('span:not(.tag-admin-delete)').textContent = data.nombre;
+                }
+                // Actualizar opciones
+                document.querySelectorAll(`#taskTag option[value="${id}"], #detailTaskTag option[value="${id}"]`)
+                  .forEach(o=>o.textContent = data.nombre);
+                // Actualizar badges en cards
+                document.querySelectorAll(`.kanban-card [data-tag-id="${id}"]`).forEach(b=>{
+                    b.textContent = data.nombre;
+                    b.style.backgroundColor = data.color;
+                });
+                Swal.fire({icon:'success', title:'Tag actualizado', timer:900, showConfirmButton:false});
+                exitTagEditMode();
+            }).catch(()=> Swal.fire({icon:'error', title:'Error de red'}));
+        }
     });
 });
 </script>

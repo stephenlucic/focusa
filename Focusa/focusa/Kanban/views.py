@@ -141,5 +141,28 @@ def eliminar_tarea(request, pk):
 @login_required
 def eliminar_tag(request, pk):
     tag = get_object_or_404(Tag, pk=pk)
-    tag.delete()  # on_delete SET_NULL en tareas
+    tag.delete()
     return JsonResponse({"ok": True})
+
+@require_POST
+@login_required
+def actualizar_tag(request, pk):
+    tag = get_object_or_404(Tag, pk=pk)
+    nombre = request.POST.get('nombre', '').strip()
+    color = request.POST.get('color', '#0d6efd').strip() or '#0d6efd'
+    if not nombre:
+        return JsonResponse({"ok": False, "error": "El nombre es obligatorio"}, status=400)
+    tag.nombre = nombre
+    tag.color = color
+    tag.save(update_fields=['nombre', 'color'])
+    return JsonResponse({"ok": True, "id": tag.id, "nombre": tag.nombre, "color": tag.color})
+
+@require_POST
+@login_required
+def crear_tag(request):
+    nombre = request.POST.get("nombre","").strip()
+    color = request.POST.get("color","#0d6efd").strip() or "#0d6efd"
+    if not nombre:
+        return JsonResponse({"ok": False, "error": "Nombre requerido"}, status=400)
+    tag = Tag.objects.create(nombre=nombre, color=color)
+    return JsonResponse({"ok": True, "id": tag.id, "nombre": tag.nombre, "color": tag.color})
