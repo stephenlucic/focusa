@@ -38,7 +38,18 @@
           <span class="label">Perfil</span>
         </a>
       </li>
+      {% if request.session.is_admin %}
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'admin_usuarios' %}active{% endif %}" href="{% url 'admin_usuarios' %} "
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Administrar usuarios">
+          <i class="bi bi-people"></i>
+          <span class="label">Administrar Usuarios</span>
+        </a>
+      </li>
+      {% endif %}
     </ul>
+
+
 
     {% comment %} <div class="mt-auto px-3 py-3 small text-white-50">
       <span class="label">© {% now "Y" %} Focusa</span>

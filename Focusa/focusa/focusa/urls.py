@@ -27,6 +27,7 @@ urlpatterns = [
     path('perfil/', include('perfil.urls')),
     path('calendario/', include('calendario.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('admin-usuarios/', include('admin_usuarios.urls')),
 ]
 
 handler404 = "focusaApp.views.error_404"

@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'css/admin_usuarios.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Admin Usuarios | Focusa{% endblock %}
+
+{% block content %}
+<h1>Administrar Usuarios</h1>
+<button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Crear Usuario</button>
+<table class="table" id="usuariosTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Usuario</th>
+      <th>Email</th>
+      <th>Grupos</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for usuario in usuarios %}
+    <tr data-user-id="{{ usuario.id }}">
+      <td>{{ usuario.id }}</td>
+      <td>{{ usuario.username }}</td>
+      <td>{{ usuario.email }}</td>
+      <td>{{ usuario.groups.all|join:", " }}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" data-user-id="{{ usuario.id }}">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="eliminarUsuario({{ usuario.id }})">Eliminar</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Modal Editar -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          {% csrf_token %}
+          <input type="hidden" id="userId" name="user_id">
+          <div class="mb-3">
+            <label>Usuario</label>
+            <input type="text" id="username" name="username" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Email</label>
+            <input type="email" id="email" name="email" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label>Grupos</label>
+            <div id="gruposContainer"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="editForm" class="btn btn-primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear -->
+<div class="modal fade" id="createModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear Usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createForm">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Usuario</label>
+              <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Email</label>
+              <input type="email" name="email" class="form-control" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Nombre</label>
+              <input type="text" name="first_name" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Apellido</label>
+              <input type="text" name="last_name" class="form-control" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Ocupación</label>
+              <input type="text" name="ocupacion" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Teléfono</label>
+              <input type="text" name="telefono" class="form-control">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Género</label>
+              <select name="genero" class="form-select">
+                <option value="">Selecciona…</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+                <option value="O">Otro</option>
+                <option value="N">Prefiero no decir</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>País</label>
+              <select name="pais" class="form-select">
+                <option value="">Selecciona…</option>
+                <option value="Chile">Chile</option>
+                <option value="Argentina">Argentina</option>
+                <option value="Perú">Perú</option>
+                <option value="México">México</option>
+                <option value="Colombia">Colombia</option>
+                <option value="España">España</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label>Contraseña</label>
+              <div class="input-group">
+                <input type="password" id="password1" name="password1" class="form-control" required>
+                <button type="button" class="btn btn-outline-secondary" type="button" onclick="togglePassword('password1')"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label>Repite Contraseña</label>
+              <div class="input-group">
+                <input type="password" id="password2" name="password2" class="form-control" required>
+                <button type="button" class="btn btn-outline-secondary" type="button" onclick="togglePassword('password2')"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label>Grupos</label>
+            {% for grupo in grupos %}
+            <div class="form-check">
+              <input type="checkbox" name="grupos" value="{{ grupo.id }}" class="form-check-input">
+              <label class="form-check-label">{{ grupo.name }}</label>
+            </div>
+            {% endfor %}
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="createForm" class="btn btn-success">Crear</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function eliminarUsuario(userId) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: 'Esta acción no se puede deshacer.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(window.location.pathname + 'eliminar/' + userId + '/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          document.querySelector(`[data-user-id="${userId}"]`).remove();
+          Swal.fire('Eliminado!', 'El usuario ha sido eliminado.', 'success');
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        Swal.fire('Error', 'No se pudo eliminar.', 'error');
+      });
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+  const editForm = document.getElementById('editForm');
+  const createModal = new bootstrap.Modal(document.getElementById('createModal'));
+  const createForm = document.getElementById('createForm');
+
+  // Al abrir modal, cargar datos
+  document.getElementById('editModal').addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    const userId = button.getAttribute('data-user-id');
+    fetch(window.location.pathname + 'editar/' + userId + '/')
+      .then(r => r.json())
+      .then(data => {
+        console.log('Datos cargados:', data);
+        document.getElementById('userId').value = data.id;
+        document.getElementById('username').value = data.username;
+        document.getElementById('email').value = data.email;
+        document.getElementById('gruposContainer').innerHTML = data.grupos_html;
+      })
+      .catch(e => console.error('Error al cargar:', e));
+  });
+
+  // Submit AJAX Editar
+  editForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(editForm);
+    fetch(window.location.pathname + 'editar/' + formData.get('user_id') + '/', {
+      method: 'POST',
+      body: formData,
+      headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        // Actualizar fila
+        const row = document.querySelector(`[data-user-id="${data.user.id}"]`);
+        row.cells[1].textContent = data.user.username;
+        row.cells[2].textContent = data.user.email;
+        row.cells[3].textContent = data.user.groups.join(', ');
+        editModal.hide();
+      }
+    })
+    .catch(e => console.error('Error al guardar:', e));
+  });
+
+  // Submit AJAX Crear
+  createForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = createForm.username.value.trim();
+    const email = createForm.email.value.trim();
+    const firstName = createForm.first_name.value.trim();
+    const lastName = createForm.last_name.value.trim();
+    const password1 = createForm.password1.value;
+    const password2 = createForm.password2.value;
+  
+    if (!username || !email || !firstName || !lastName) {
+      Swal.fire('Error', 'Usuario, email, nombre y apellido son obligatorios.', 'error');
+      return;
+    }
+    if (password1 !== password2) {
+      Swal.fire('Error', 'Las contraseñas no coinciden.', 'error');
+      return;
+    }
+    if (password1.length < 8) {
+      Swal.fire('Error', 'La contraseña debe tener al menos 8 caracteres.', 'error');
+      return;
+    }
+  
+    const formData = new FormData(createForm);
+    fetch(window.location.pathname + 'crear/', {
+      method: 'POST',
+      body: formData,
+      headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        // Añadir fila
+        const tbody = document.querySelector('#usuariosTable tbody');
+        const row = document.createElement('tr');
+        row.setAttribute('data-user-id', data.user.id);
+        row.innerHTML = `
+          <td>${data.user.id}</td>
+          <td>${data.user.username}</td>
+          <td>${data.user.email}</td>
+          <td>${data.user.groups.join(', ')}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" data-user-id="${data.user.id}">Editar</button>
+            <button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${data.user.id})">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+        createModal.hide();
+        createForm.reset();
+      } else {
+        Swal.fire('Error', data.error || 'No se pudo crear.', 'error');
+      }
+    })
+    .catch(e => {
+      console.error(e);
+      Swal.fire('Error', 'Error de conexión.', 'error');
+    });
+  });
+
+});
+
+function togglePassword(id) {
+  const input = document.getElementById(id);
+  const button = input.nextElementSibling;
+  const icon = button.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.remove('bi-eye');
+    icon.classList.add('bi-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.remove('bi-eye-slash');
+    icon.classList.add('bi-eye');
+  }
+}
+</script>
+{% endblock %}

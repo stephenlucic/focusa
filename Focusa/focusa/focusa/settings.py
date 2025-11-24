@@ -16,6 +16,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/kanban/' 
 LOGOUT_REDIRECT_URL = '/'
@@ -35,6 +37,7 @@ INSTALLED_APPS = [
     'calendario',
     'home',
     'dashboard',
+    'admin_usuarios',
 ]
 
 MIDDLEWARE = [
@@ -70,26 +73,26 @@ WSGI_APPLICATION = 'focusa.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'focusa_bd',
-#         'USER': 'root',
-#         'PASSWORD': '123456',
-#         'HOST': '127.0.0.1',
-#         'PORT': '3307',
-#         'OPTIONS': {
-#             'autocommit': True,   
-#         }
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'focusa_bd',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '3307',
+        'OPTIONS': {
+            'autocommit': True,   
+        }
+    }
+}
 
 # 'HOST': 'localhost',
 

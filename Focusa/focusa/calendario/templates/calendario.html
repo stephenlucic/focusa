@@ -22,6 +22,13 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  const estadoMap = {
+    todo: "Por hacer",
+    progress: "En proceso",
+    review: "En revisión",
+    done: "Completada"
+  };
+
   const calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
     initialView: "dayGridMonth",
     locale: "es",
@@ -60,6 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
         titleEl.textContent = txt;
       }
     },
+    eventDidMount: function(info){
+      const p = info.event.extendedProps.prioridad || "-";
+      const e = estadoMap[info.event.extendedProps.estado] || info.event.extendedProps.estado;
+      info.el.setAttribute("title", `Prioridad: ${p}\nEstado: ${e}`);
+    }
   });
   calendar.render();
 });
