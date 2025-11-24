@@ -6,13 +6,15 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
+import os
 
 @login_required
 def kanban(request):
     if request.method == "POST":
         action = request.POST.get("action")
 
-        # 1) Crear TAG
+        # 1) Crear TAG (sin cambios)
         if action == "create_tag":
             nombre = request.POST.get("name", "").strip()
             color = request.POST.get("color", "#0d6efd").strip() or "#0d6efd"
@@ -37,7 +39,7 @@ def kanban(request):
                 tag = None
 
         if titulo:
-            Tarea.objects.create(
+            tarea = Tarea.objects.create(
                 titulo=titulo,
                 descripcion=descripcion,
                 prioridad=prioridad,
@@ -47,6 +49,10 @@ def kanban(request):
                 fecha_hasta=fecha_hasta,
                 tag=tag,
             )
+            # asignar attachment si viene en request.FILES
+            if 'attachment' in request.FILES:
+                tarea.attachment = request.FILES['attachment']
+                tarea.save(update_fields=['attachment'])
         return redirect("kanban")
 
     tareas = Tarea.objects.filter(responsable=request.user).order_by("fecha_creacion")
@@ -113,11 +119,25 @@ def tarea_detalle_actualizar(request, pk):
         tarea.fecha_desde = fecha_desde
         tarea.fecha_hasta = fecha_hasta
         tarea.tag = tag
+
+        # manejar nuevo attachment (reemplaza el anterior gracias al pre_save signal)
+        if 'attachment' in request.FILES:
+            tarea.attachment = request.FILES['attachment']
+
         tarea.save()
 
-        return JsonResponse({"ok": True})
+        # preparar info de adjunto para devolver al cliente
+        attachment_info = None
+        if tarea.attachment:
+            attachment_info = {
+                "url": tarea.attachment.url,
+                "name": os.path.basename(tarea.attachment.name),
+                "size": tarea.attachment.size if hasattr(tarea.attachment, 'size') else None
+            }
 
-    # GET: devolver datos para rellenar la modal
+        return JsonResponse({"ok": True, "attachment": attachment_info})
+
+    # GET: devolver datos para rellenar la modal (incluye adjunto)
     data = {
         "id": tarea.id,
         "titulo": tarea.titulo,
@@ -127,6 +147,8 @@ def tarea_detalle_actualizar(request, pk):
         "fecha_desde": tarea.fecha_desde.isoformat() if tarea.fecha_desde else "",
         "fecha_hasta": tarea.fecha_hasta.isoformat() if tarea.fecha_hasta else "",
         "tag_id": tarea.tag_id,
+        "attachment_url": tarea.attachment.url if tarea.attachment else "",
+        "attachment_name": os.path.basename(tarea.attachment.name) if tarea.attachment else ""
     }
     return JsonResponse({"ok": True, "tarea": data})
 
@@ -166,3 +188,19 @@ def crear_tag(request):
         return JsonResponse({"ok": False, "error": "Nombre requerido"}, status=400)
     tag = Tag.objects.create(nombre=nombre, color=color)
     return JsonResponse({"ok": True, "id": tag.id, "nombre": tag.nombre, "color": tag.color})
+
+@require_POST
+@login_required
+def eliminar_attachment_tarea(request, pk):
+    tarea = get_object_or_404(Tarea, pk=pk, responsable=request.user)
+    if not tarea.attachment:
+        return JsonResponse({"ok": False, "error": "No hay adjunto"}, status=400)
+    # borrar archivo y limpiar campo
+    try:
+        if tarea.attachment.path and os.path.isfile(tarea.attachment.path):
+            os.remove(tarea.attachment.path)
+    except Exception:
+        pass
+    tarea.attachment = None
+    tarea.save(update_fields=['attachment'])
+    return JsonResponse({"ok": True})

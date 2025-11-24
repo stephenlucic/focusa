@@ -413,6 +413,16 @@
             </select>
           </div>
 
+          <div class="mt-3">
+            <label class="form-label">Adjunto</label>
+            <div id="detailAttachmentArea" class="mb-2">
+              <!-- se rellena por JS: enlace/ver/eliminar si existe -->
+            </div>
+            <div>
+              <input class="form-control" type="file" id="detailTaskAttachment" name="attachment">
+              <small class="text-muted">Puedes subir cualquier tipo de documento. Subir reemplaza el adjunto actual.</small>
+            </div>
+          </div>
         </form>
         <div id="taskDetailError" class="text-danger small mt-2" style="display:none;"></div>
       </div>
@@ -652,6 +662,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('detailTaskEndDate').value = t.fecha_hasta || '';
                 document.getElementById('detailTaskTag').value = t.tag_id || '';
 
+                // Renderizar área de adjunto si existe
+                renderAttachmentArea(t.attachment_url, t.attachment_name, taskId);
+
                 taskDetailModal.show();
             })
             .catch(err => {
@@ -691,6 +704,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('taskDetailError').textContent = data.error || 'Error al guardar los cambios.';
                     document.getElementById('taskDetailError').style.display = 'block';
                     return;
+                }
+                // Actualizar área de adjunto si se recibe nueva información
+                if (data.attachment) {
+                    renderAttachmentArea(data.attachment.url, data.attachment.name, taskId);
                 }
                 location.reload();
             })
@@ -987,6 +1004,84 @@ document.addEventListener('DOMContentLoaded', function() {
             }).catch(()=> Swal.fire({icon:'error', title:'Error de red'}));
         }
     });
+
+    /* Inserta dentro de DOMContentLoaded, después de cargar la tarea en el modal */
+    function renderAttachmentArea(attachment_url, attachment_name, taskId) {
+        const area = document.getElementById('detailAttachmentArea');
+        area.innerHTML = '';
+        if (attachment_url) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex align-items-center gap-2';
+            const link = document.createElement('a');
+            link.href = attachment_url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.textContent = attachment_name || 'Ver adjunto';
+            link.className = 'btn btn-outline-primary btn-sm';
+            // botón descargar: fuerza descarga
+            const dl = document.createElement('a');
+            dl.href = attachment_url;
+            dl.download = attachment_name || '';
+            dl.className = 'btn btn-outline-secondary btn-sm';
+            dl.textContent = 'Descargar';
+            // botón eliminar
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'btn btn-outline-danger btn-sm';
+            delBtn.textContent = 'Eliminar';
+            delBtn.addEventListener('click', function() {
+                Swal.fire({
+                    title: '¿Eliminar adjunto?',
+                    text: 'Esta acción eliminará el archivo adjunto. ¿Continuar?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+                    fetch(`{% url 'kanban_tarea_eliminar_attachment' 0 %}`.replace('/0/', `/${taskId}/`), {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    }).then(r => r.json()).then(data => {
+                        if (data.ok) {
+                            area.innerHTML = '';
+                            const input = document.getElementById('detailTaskAttachment');
+                            if (input) input.value = '';
+                            Swal.fire({ icon: 'success', title: 'Adjunto eliminado', timer: 1200, showConfirmButton: false });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: data.error || 'No se pudo eliminar el adjunto.' });
+                        }
+                    }).catch(() => {
+                        Swal.fire({ icon: 'error', title: 'Error de red', text: 'Inténtalo nuevamente.' });
+                    });
+                });
+            });
+            wrapper.appendChild(link);
+            wrapper.appendChild(dl);
+            wrapper.appendChild(delBtn);
+            area.appendChild(wrapper);
+        } else {
+            area.innerHTML = '<small class="text-muted">No hay adjunto.</small>';
+        }
+    }
+
+    /* En el fetch GET que rellena la modal (línea donde asignas t = data.tarea) añade:
+       renderAttachmentArea(data.tarea.attachment_url, data.tarea.attachment_name, taskId);
+    */
+
+    /* En el handler de guardar (POST) cuando recibas JSON de respuesta, si devuelve attachment puedes actualizar el área sin recargar:
+       if (data.ok) {
+         if (data.attachment) {
+            renderAttachmentArea(data.attachment.url, data.attachment.name, taskId);
+         }
+         location.reload(); // opcional si quieres refrescar todo
+       }
+    */
 });
 </script>
 {% endblock %}

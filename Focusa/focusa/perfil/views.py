@@ -10,6 +10,7 @@ def ver_perfil(request):
     perfil, _ = Perfil.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
+        # usuario
         u = request.user
         u.first_name = request.POST.get("first_name", u.first_name).strip()
         u.last_name  = request.POST.get("last_name", u.last_name).strip()
@@ -21,10 +22,16 @@ def ver_perfil(request):
             u.email = new_email
         u.save()
 
+        # campos de perfil
         perfil.telefono  = request.POST.get("telefono", perfil.telefono).strip()
         perfil.ocupacion = request.POST.get("ocupacion", perfil.ocupacion).strip()
         perfil.genero    = request.POST.get("genero", perfil.genero)
         perfil.pais      = request.POST.get("pais", perfil.pais).strip()
+
+        # guardar avatar si viene archivo
+        if 'avatar' in request.FILES:
+            perfil.avatar = request.FILES['avatar']
+
         perfil.save()
 
         messages.success(request, "Perfil actualizado correctamente.")
