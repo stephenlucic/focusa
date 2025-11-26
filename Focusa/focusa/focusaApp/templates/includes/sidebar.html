@@ -25,7 +25,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link d-flex align-items-center gap-2" href="#"
+        <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}" href="{% url 'configuracion' %}"
            data-bs-toggle="tooltip" data-bs-placement="right" title="Configuración">
           <i class="bi bi-gear"></i>
           <span class="label">Configuración</span>

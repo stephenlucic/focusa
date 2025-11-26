@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'home',
     'dashboard',
     'admin_usuarios',
+    'notificacion',
+    'configuracion',
 ]
 
 MIDDLEWARE = [
