@@ -116,6 +116,13 @@ def _weekly_productivity(user):
     ]
     return semanas, series
 
+def contar_tareas_pendientes(user_id):
+    """Cuenta todas las tareas que NO están completadas (estado != 'done')"""
+    with connection.cursor() as cursor:
+        cursor.callproc('sp_contar_tareas_pendientes', [user_id])
+        row = cursor.fetchone()
+    return row[0] if row else 0
+
 @login_required
 def dashboard(request):
     user = request.user
@@ -123,6 +130,9 @@ def dashboard(request):
     # Tareas por hacer (SP)
     tareas_por_hacer = fetch_tareas_por_hacer(user.id)
     total_por_hacer = contar_tareas_por_hacer(user.id)
+
+    # Tareas pendientes (cualquier estado excepto 'done')
+    total_pendientes = contar_tareas_pendientes(user.id)
 
     # Tabla completa (ejemplo: últimas 50 tareas del usuario)
     tareas_qs = (Tarea.objects
@@ -165,10 +175,12 @@ def dashboard(request):
     productividad_pct = round((tareas_completadas / total_creadas)*100, 1) if total_creadas else 0
 
     resumen = {
-        "tareas_creadas": total_por_hacer,
+        "tareas_creadas": total_creadas,        # <-- total de tareas creadas
+        "tareas_pendientes": total_pendientes,  # <-- todas las tareas sin completar
+        "tareas_por_hacer": total_por_hacer,    # <-- solo estado 'todo'
         "tareas_completadas": tareas_completadas,
         "productividad_pct": productividad_pct,
-        "dias_activos": 0  # puedes calcular días desde primera tarea
+        "dias_activos": 0
     }
 
     ctx = {

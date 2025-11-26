@@ -5,21 +5,28 @@
 {% endblock %} {% block content %}
 
 <div class="row metric-row">
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="metric-card">
-      <div class="metric-value">{{ resumen.tareas_creadas }}</div>
+      <div class="metric-value">{{ resumen.tareas_pendientes }}</div>
+      <div class="metric-label">Tareas pendientes</div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="metric-card">
+      <div class="metric-value">{{ resumen.tareas_por_hacer }}</div>
       <div class="metric-label">Tareas por hacer</div>
     </div>
   </div>
 
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="metric-card">
       <div class="metric-value">{{ resumen.tareas_completadas }}</div>
       <div class="metric-label">Tareas completadas</div>
     </div>
   </div>
 
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="metric-card">
       <div class="metric-value">{{ resumen.productividad_pct }}%</div>
       <div class="metric-label">Productividad</div>
