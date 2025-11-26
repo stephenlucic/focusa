@@ -20,3 +20,6 @@ venv/
 .idea/
 .vscode/
 git
+
+# Archivos subidos por usuarios
+Focusa/focusa/archivos/

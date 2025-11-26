@@ -1,0 +1,201 @@
+.config-section {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(20, 33, 39, 0.06);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.config-section:hover {
+  box-shadow: 0 4px 12px rgba(44, 112, 184, 0.08);
+  border-color: #cbd5e1;
+}
+
+.config-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--focusa-text);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--focusa-blue);
+}
+
+.config-section-title i {
+  color: var(--focusa-blue);
+  font-size: 1.25rem;
+}
+
+.config-section-desc {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.config-option {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.3s ease;
+}
+
+.config-option:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.config-option-label {
+  font-weight: 600;
+  color: var(--focusa-text);
+  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+}
+
+.config-option-help {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Switches personalizados con colores Focusa */
+.form-switch {
+  padding-left: 0;
+  position: relative;
+}
+
+.form-switch .form-check-input {
+  cursor: pointer;
+  width: 3rem;
+  height: 1.5rem;
+  border: 2px solid #cbd5e1;
+  background-color: #e2e8f0 !important;
+  background-image: none !important;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.form-switch .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(44, 112, 184, 0.15) !important;
+  border-color: var(--focusa-blue) !important;
+}
+
+.form-switch .form-check-input:checked {
+  background-color: #372e75 !important;
+  border-color: #000000 !important;
+  background-image: none !important;
+}
+
+.form-switch .form-check-input::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 1.125rem;
+  height: 1.125rem;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translateX(1.5rem);
+}
+
+/* Botones personalizados con colores Focusa - Especificidad máxima */
+.config-section .btn-primary,
+.config-section a.btn-primary,
+.config-section button.btn-primary {
+  background-color: #3e1e83 !important;
+  border-color: #6b2cb8 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.config-section .btn-primary:hover,
+.config-section .btn-primary:focus,
+.config-section .btn-primary:active,
+.config-section a.btn-primary:hover,
+.config-section button.btn-primary:hover {
+  background-color: #452498 !important;
+  border-color: #5933a5 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.config-section .btn-outline-primary {
+  color: #2C70B8 !important;
+  border-color: #2C70B8 !important;
+  background-color: transparent !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.config-section .btn-outline-primary:hover,
+.config-section .btn-outline-primary:focus,
+.config-section .btn-outline-primary:active {
+  background-color: #2C70B8 !important;
+  border-color: #2C70B8 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.config-section .btn-outline-secondary {
+  color: #64748b !important;
+  border-color: #cbd5e1 !important;
+  background-color: transparent !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.config-section .btn-outline-secondary:hover,
+.config-section .btn-outline-secondary:focus,
+.config-section .btn-outline-secondary:active {
+  background-color: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+  color: #142127 !important;
+}
+
+.config-section .btn-outline-success {
+  color: #0C9C67 !important;
+  border-color: #0C9C67 !important;
+  background-color: transparent !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.config-section .btn-outline-success:hover,
+.config-section .btn-outline-success:focus,
+.config-section .btn-outline-success:active {
+  background-color: #0C9C67 !important;
+  border-color: #0C9C67 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.config-section .btn-outline-danger {
+  color: #EF3942 !important;
+  border-color: #EF3942 !important;
+  background-color: transparent !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.config-section .btn-outline-danger:hover,
+.config-section .btn-outline-danger:focus,
+.config-section .btn-outline-danger:active {
+  background-color: #EF3942 !important;
+  border-color: #EF3942 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+

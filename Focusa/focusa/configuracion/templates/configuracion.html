@@ -3,7 +3,251 @@
 
 {% block title %}Focusa | Configuración{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/configuracion.css' %}">
+{% endblock %}
+
 {% block content %}  
-<h1>Configuración</h1>
-<p>Esta es la página de configuración.</p>
-{% endblock %}   
+<div class="container-fluid px-4 py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="h2 mb-2">
+        <i class="bi bi-gear-fill text-focusa me-2"></i>Configuración
+      </h1>
+      <p class="text-muted mb-0">Administra las preferencias de tu cuenta</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-10 col-xl-9">
+      
+      <!-- Sección: Suscripción -->
+      <div class="config-section">
+        <div class="config-section-title">
+          <i class="bi bi-star-fill"></i>
+          <span>Suscripción y Plan</span>
+        </div>
+        <p class="config-section-desc">
+          Administra tu plan actual y descubre las funcionalidades premium
+        </p>
+        
+        <div class="row align-items-center">
+          <div class="col-md-7 mb-3 mb-md-0">
+            <div class="config-option-label mb-2">
+              Plan actual: <span class="badge bg-secondary ms-1">Básico</span>
+            </div>
+            <div class="config-option-help">Acceso a funcionalidades limitadas</div>
+          </div>
+          <div class="col-md-5 text-md-end">
+            <a href="{% url 'suscripcion' %}" class="btn btn-primary">
+              <i class="bi bi-arrow-up-circle me-2"></i>Ver Planes
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} <!-- Sección: Notificaciones -->
+      <div class="config-section">
+        <div class="config-section-title">
+          <i class="bi bi-bell-fill"></i>
+          <span>Notificaciones</span>
+        </div>
+        <p class="config-section-desc">
+          Controla cómo y cuándo recibes notificaciones
+        </p>
+
+        <div class="config-option">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <div class="config-option-label">
+                <i class="bi bi-envelope text-focusa me-2"></i>Notificaciones por email
+              </div>
+              <div class="config-option-help">Recibe actualizaciones de tareas y recordatorios</div>
+            </div>
+            <div class="form-check form-switch ms-3">
+              <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-option">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <div class="config-option-label">
+                <i class="bi bi-alarm text-warning me-2"></i>Recordatorios de vencimiento
+              </div>
+              <div class="config-option-help">Alertas 24h antes de fechas límite</div>
+            </div>
+            <div class="form-check form-switch ms-3">
+              <input class="form-check-input" type="checkbox" id="deadlineReminder" checked>
+            </div>
+          </div>
+        </div>
+
+        <div class="config-option">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <div class="config-option-label">
+                <i class="bi bi-calendar-week text-success me-2"></i>Resumen semanal
+              </div>
+              <div class="config-option-help">Informe de productividad cada lunes</div>
+            </div>
+            <div class="form-check form-switch ms-3">
+              <input class="form-check-input" type="checkbox" id="weeklyDigest">
+            </div>
+          </div>
+        </div>
+      </div> {% endcomment %}
+
+<!-- Sección: Privacidad y Seguridad -->
+      <div class="config-section">
+        <div class="config-section-title">
+          <i class="bi bi-shield-lock-fill"></i>
+          <span>Privacidad y Seguridad</span>
+        </div>
+        <p class="config-section-desc">
+          Protege tu cuenta y gestiona tus datos
+        </p>
+
+        {% comment %} <div class="config-option">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="flex-grow-1">
+              <div class="config-option-label">
+                <i class="bi bi-shield-check text-success me-2"></i>Autenticación de dos factores
+              </div>
+              <div class="config-option-help">Añade una capa extra de seguridad</div>
+            </div>
+            <button class="btn btn-outline-success btn-sm">
+              <i class="bi bi-plus-circle me-1"></i>Activar
+            </button>
+          </div>
+        </div> {% endcomment %}
+
+        <div class="config-option">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="flex-grow-1">
+              <div class="config-option-label">
+                <i class="bi bi-key text-focusa me-2"></i>Cambiar contraseña
+              </div>
+              <div class="config-option-help">Última actualización: hace 3 meses</div>
+            </div>
+            {% comment %} <button class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-pencil me-1"></i>Cambiar
+            </button> {% endcomment %}
+          </div>
+        </div>
+      </div> 
+
+      <!-- Sección: Preferencias de Interfaz -->
+      <div class="config-section">
+        <div class="config-section-title">
+          <i class="bi bi-palette-fill"></i>
+          <span>Preferencias de Interfaz</span>
+        </div>
+        <p class="config-section-desc">
+          Personaliza tu experiencia visual
+        </p>
+
+         <div class="config-option">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="flex-grow-1">
+              <div class="config-option-label">
+                <i class="bi bi-moon-stars text-dark me-2"></i>Modo oscuro
+              </div>
+              <div class="config-option-help">Reduce el brillo de la pantalla</div>
+            </div>
+            <div class="form-check form-switch ms-3">
+              <input class="form-check-input" type="checkbox" id="darkMode">
+            </div>
+          </div>
+        </div> 
+
+        <div class="config-option">
+          <div class="row align-items-center g-3">
+            <div class="col-md-6">
+              <div class="config-option-label">
+                <i class="bi bi-translate text-focusa me-2"></i>Idioma de la interfaz
+              </div>
+              <div class="config-option-help">Selecciona tu idioma preferido</div>
+            </div>
+            <div class="col-md-6">
+              <select class="form-select" id="language">
+                <option value="es" selected>🇪🇸 Español</option>
+                <option value="en">🇺🇸 English</option>
+                <option value="pt">🇧🇷 Português</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% comment %} <!-- Sección: Datos y Privacidad -->
+      <div class="config-section">
+        <div class="config-section-title">
+          <i class="bi bi-file-earmark-text-fill"></i>
+          <span>Datos y Privacidad</span>
+        </div>
+        <p class="config-section-desc">
+          Gestiona y exporta tus datos
+        </p>
+
+        <div class="config-option">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="flex-grow-1">
+              <div class="config-option-label">
+                <i class="bi bi-download text-focusa me-2"></i>Exportar mis datos
+              </div>
+              <div class="config-option-help">Descarga una copia de tu información</div>
+            </div>
+            <button class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-file-earmark-arrow-down me-1"></i>Exportar
+            </button>
+          </div>
+        </div>
+
+        <div class="config-option">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="flex-grow-1">
+              <div class="config-option-label text-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>Eliminar cuenta
+              </div>
+              <div class="config-option-help">Esta acción es permanente e irreversible</div>
+            </div>
+            <button class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+          </div>
+        </div>
+      </div> {% endcomment %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Guardar cambios de switches automáticamente
+document.querySelectorAll('.form-check-input').forEach(input => {
+  input.addEventListener('change', function() {
+    console.log(`${this.id}: ${this.checked}`);
+    
+    // Mostrar feedback visual
+    const parent = this.closest('.config-option');
+    parent.style.backgroundColor = '#f0f9ff';
+    setTimeout(() => {
+      parent.style.backgroundColor = '';
+    }, 300);
+  });
+});
+
+// Selector de idioma
+document.getElementById('language')?.addEventListener('change', function() {
+  console.log('Idioma seleccionado:', this.value);
+  
+  // Aquí podrías hacer fetch para guardar en backend
+  alert(`Idioma cambiado a: ${this.options[this.selectedIndex].text}`);
+});
+</script>
+{% endblock %}

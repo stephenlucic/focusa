@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'admin_usuarios',
     'notificacion',
     'configuracion',
+    'suscripcion',
 ]
 
 MIDDLEWARE = [
