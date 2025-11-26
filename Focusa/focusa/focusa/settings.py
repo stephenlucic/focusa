@@ -64,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notificacion.context_processors.notificaciones_header',
             ],
         },
     },
@@ -121,9 +122,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-cl'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago'
 
 USE_I18N = True
 
@@ -146,3 +147,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/archivos/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "archivos")
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'notificacionesfocusa@gmail.com'
+EMAIL_HOST_PASSWORD = 'yhalzezcirppvfhu'  # contraseña de aplicación, NO tu clave normal
+
+DEFAULT_FROM_EMAIL = 'Focusa <no-reply@focusa.cl>'  # o el correo que quieras mostrar
+SITE_URL = 'http://localhost:8000'  # para armar links en el correo

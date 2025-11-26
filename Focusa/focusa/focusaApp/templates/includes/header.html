@@ -11,10 +11,59 @@
 
     <div class="ms-auto d-flex align-items-center gap-3">
       <!-- Notificaciones -->
-      <button class="btn btn-notify text-white p-0" type="button" aria-label="Notificaciones">
-        <i class="bi bi-bell"></i>
-        <span class="badge rounded-pill">2</span>
-      </button>
+      <div class="dropdown">
+        <button
+          class="btn btn-notify text-white p-0"
+          type="button"
+          id="dropdownNotificaciones"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          aria-label="Notificaciones"
+        >
+          <i class="bi bi-bell"></i>
+      
+          <span
+            id="notif-badge"
+            class="badge rounded-pill position-absolute top-0 start-100 translate-middle {% if not notif_no_leidas_count %}d-none{% endif %}"
+          >
+            {{ notif_no_leidas_count|default:0 }}
+          </span>
+        </button>
+      
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-notify" aria-labelledby="dropdownNotificaciones">
+          {% if ultimas_notificaciones %}
+            {% for n in ultimas_notificaciones %}
+              <li>
+                <!-- Todas las opciones llevan a la página de notificaciones -->
+                <a class="dropdown-item small" href="{% url 'notificaciones' %}">
+                  <div class="d-flex flex-column">
+                    <span>
+                      <strong>[{{ n.get_accion_display }}]</strong>
+                      {{ n.titulo }}
+                    </span>
+                    <small class="text-muted">
+                      {{ n.creada_en|timesince }} atrás
+                    </small>
+                  </div>
+                </a>
+              </li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-center fw-semibold" href="{% url 'notificaciones' %}">
+                Ver todas las notificaciones
+              </a>
+            </li>
+          {% else %}
+            <li>
+              <span class="dropdown-item small text-muted">
+                No tienes notificaciones nuevas
+              </span>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+
 
       <!-- Perfil (dinámico) -->
       <div class="dropdown">
@@ -50,3 +99,33 @@
     </div>
   </div>
 </nav>
+
+<script>
+  function actualizarBadgeNotificaciones() {
+    fetch("{% url 'notificaciones_count' %}")
+      .then(response => response.json())
+      .then(data => {
+        const badge = document.getElementById('notif-badge');
+        if (!badge) return;
+
+        const count = data.count || 0;
+
+        if (count > 0) {
+          badge.textContent = count;
+          badge.classList.remove('d-none');
+        } else {
+          badge.textContent = 0;
+          badge.classList.add('d-none');
+        }
+      })
+      .catch(err => {
+        console.error("Error actualizando badge de notificaciones:", err);
+      });
+  }
+
+  // Opción 1: refrescar cada cierto tiempo (por ejemplo, cada 15s)
+  setInterval(actualizarBadgeNotificaciones, 3000);
+
+  // Opción 2 (recomendado): llamar una vez al cargar la página
+  document.addEventListener('DOMContentLoaded', actualizarBadgeNotificaciones);
+</script>

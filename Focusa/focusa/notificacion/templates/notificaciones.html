@@ -1,10 +1,80 @@
 {% extends "base.html" %}
-
+{% load tz %}
 {% load static %}
 
 {% block title %}Focusa | Notificaciones{% endblock %}
 
 {% block content %}
-<h1>Notificaciones</h1>
-<p>Esta es la página de notificaciones.</p>
-{% endblock %}  
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="mb-0">Notificaciones</h2>
+      <small class="text-muted">
+        Aquí puedes revisar el historial de cambios en tus tareas.
+      </small>
+    </div>
+
+    <form method="post" class="d-inline">
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="btn btn-sm btn-outline-primary"
+        {% if not notif_no_leidas_count %}disabled{% endif %}
+      >
+        Marcar todas como leídas
+      </button>
+    </form>
+  </div>
+
+  {% if notificaciones %}
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          {% for n in notificaciones %}
+            <li class="list-group-item">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <!-- badge por tipo de acción -->
+                  {% if n.accion == 'creacion' %}
+                    <span class="badge bg-success me-2">Creación</span>
+                  {% elif n.accion == 'actualizacion' %}
+                    <span class="badge bg-warning text-dark me-2">Actualización</span>
+                  {% elif n.accion == 'eliminacion' %}
+                    <span class="badge bg-danger me-2">Eliminación</span>
+                  {% endif %}
+
+                  <!-- título + mensaje -->
+                  <span class="{% if not n.leida %}fw-semibold{% endif %}">
+                    {{ n.titulo }}
+                  </span>
+                  <div class="small text-muted mt-1">
+                    {{ n.mensaje }}
+                  </div>
+                </div>
+
+                <div class="text-end">
+                  <!-- fecha en horario local -->
+                  <div class="small text-muted">
+                    {{ n.creada_en|localtime }}
+                  </div>
+                  <!-- tiempo relativo, opcional -->
+                  <div class="small text-muted">
+                    hace {{ n.creada_en|timesince }}
+                  </div>
+                  {% if not n.leida %}
+                    <span class="badge bg-primary mt-1">Nueva</span>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-success" role="alert">
+      No tienes notificaciones por ahora ✅
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
