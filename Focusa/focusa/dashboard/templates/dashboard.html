@@ -1,8 +1,20 @@
 {% extends 'base.html' %} 
 {% load static %} 
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
-{% endblock %} {% block content %}
+{% endblock %} 
+
+{% block content %}
+
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }} d-flex justify-content-between align-items-center px-3 py-2 mb-3">
+      <span>{{ m.message }}</span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
 
 <div class="row metric-row">
   <div class="col-md-3">
@@ -41,9 +53,10 @@
 
   <!-- Tareas por semana -->
   <div class="col-lg-6">
-    <div class="card h-100">
+    <div class="card h-100 {% if not es_pro %}card-locked{% endif %}">
       <div class="card-header">Progreso semanal de tareas</div>
-        <div class="card-body">
+      <div class="card-body">
+        {% if es_pro %}
           <div
             id="chart-productividad"
             class="focusa-chart"
@@ -51,66 +64,126 @@
             data-height="300"
             data-labels='{{ productividad_labels_json|safe }}'
             data-series='{{ productividad_series_json|safe }}'
-        ></div>
+          ></div>
+        {% else %}
+          <div class="focusa-locked">
+            <i class="bi bi-lock-fill lock-icon"></i>
+            <p class="mb-2">Disponible solo en Focusa Pro</p>
+            <a href="{% url 'suscripcion' %}" class="btn btn-sm btn-primary">Actualizar a Pro</a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
 
-<!-- Prioridades -->
+  <!-- Prioridades -->
   <div class="col-lg-6">
-    <div class="card h-100">
+    <div class="card h-100 {% if not es_pro %}card-locked{% endif %}">
       <div class="card-header">Tareas por prioridad</div>
       <div class="card-body">
-        <div
-          id="chart-prioridades"
-          class="focusa-chart"
-          data-type="pie"
-          data-stacked="true"
-          data-height="340"
-          data-labels='{{ prioridades_labels_json|safe }}'
-          data-series='{{ prioridades_series_json|safe }}'
-        ></div>
+        {% if es_pro %}
+          <div
+            id="chart-prioridades"
+            class="focusa-chart"
+            data-type="pie"
+            data-height="340"
+            data-labels='{{ prioridades_labels_json|safe }}'
+            data-series='{{ prioridades_series_json|safe }}'
+          ></div>
+        {% else %}
+          <div class="focusa-locked">
+            <i class="bi bi-lock-fill lock-icon"></i>
+            <p class="mb-2">Disponible solo en Focusa Pro</p>
+            <a href="{% url 'suscripcion' %}" class="btn btn-sm btn-primary">Actualizar a Pro</a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
+
 </div>
 
+
 <div class="row g-4 mb-4">
-  <!-- Distribución estados (dona) -->
+
+  <!-- Estados (dona) -->
   <div class="col-lg-6">
-    <div class="card h-100">
+    <div class="card h-100 {% if not es_pro %}card-locked{% endif %}">
       <div class="card-header">Estados de tareas</div>
       <div class="card-body">
-        <div
-          id="chart-estados"
-          class="focusa-chart"
-          data-type="donut"
-          data-height="320"
-          data-labels='{{ estados_labels_json|safe }}'
-          data-series='{{ estados_values_json|safe }}'
-        ></div>
+        {% if es_pro %}
+          <div
+            id="chart-estados"
+            class="focusa-chart"
+            data-type="donut"
+            data-height="320"
+            data-labels='{{ estados_labels_json|safe }}'
+            data-series='{{ estados_values_json|safe }}'
+          ></div>
+        {% else %}
+          <div class="focusa-locked">
+            <i class="bi bi-lock-fill lock-icon"></i>
+            <p class="mb-2">Disponible solo en Focusa Pro</p>
+            <a href="{% url 'suscripcion' %}" class="btn btn-sm btn-primary">Actualizar a Pro</a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
 
   <!-- Progreso mensual -->
   <div class="col-lg-6">
-    <div class="card h-100">
+    <div class="card h-100 {% if not es_pro %}card-locked{% endif %}">
       <div class="card-header">Progreso mensual</div>
       <div class="card-body">
-        <div
-          id="chart-progreso"
-          class="focusa-chart"
-          data-type="area"
-          data-stacked="true"
-          data-height="320"
-          data-labels='{{ meses_json|safe }}'
-          data-series='{{ progreso_series_json|safe }}'
-        ></div>
+        {% if es_pro %}
+          <div
+            id="chart-progreso"
+            class="focusa-chart"
+            data-type="area"
+            data-stacked="true"
+            data-height="320"
+            data-labels='{{ meses_json|safe }}'
+            data-series='{{ progreso_series_json|safe }}'
+          ></div>
+        {% else %}
+          <div class="focusa-locked">
+            <i class="bi bi-lock-fill lock-icon"></i>
+            <p class="mb-2">Disponible solo en Focusa Pro</p>
+            <a href="{% url 'suscripcion' %}" class="btn btn-sm btn-primary">Actualizar a Pro</a>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
+
 </div>
+
+<div class="d-flex justify-content-end mb-3">
+  {% if es_pro %}
+    <a href="{% url 'export_dashboard_excel' %}" class="btn btn-success me-2">
+      <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+    </a>
+    <a href="{% url 'export_dashboard_pdf' %}" class="btn btn-danger">
+      <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+    </a>
+  {% else %}
+    <div class="export-locked-wrapper text-end">
+      <button type="button" class="btn btn-outline-secondary me-2 export-locked" disabled>
+        <i class="bi bi-lock-fill me-1"></i>
+        Exportar Excel
+      </button>
+      <button type="button" class="btn btn-outline-secondary export-locked" disabled>
+        <i class="bi bi-lock-fill me-1"></i>
+        Exportar PDF
+      </button>
+      <small class="text-muted d-block mt-1">
+        Función disponible solo en <strong>Focusa Pro</strong>
+      </small>
+    </div>
+  {% endif %}
+</div>
+
 
 <div class="row g-4 mb-4">
   <!-- Tabla detalle tareas -->
@@ -179,4 +252,3 @@
   <script src="{% static 'js/focusa-theme.js' %}" defer></script>
   <script src="{% static 'js/dashboard.js' %}" defer></script>
   {% endblock %}
-</div>

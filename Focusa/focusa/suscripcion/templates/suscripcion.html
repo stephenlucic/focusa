@@ -62,9 +62,9 @@
                         <i class="bi bi-check-circle-fill"></i>
                         <span>Dashboard básico</span>
                     </li>
-                    <li>
-                        <i class="bi bi-check-circle-fill"></i>
-                        <span>Exportación solo PDF</span>
+                    <li class="locked">
+                        <i class="bi bi-lock-fill lock-icon"></i>
+                        <span>Exportación solo PDF (bloqueado)</span>
                     </li>
                     <li class="locked">
                         <i class="bi bi-lock-fill lock-icon"></i>
@@ -75,8 +75,17 @@
                         <span>Exportación Excel (bloqueado)</span>
                     </li>
                 </ul>
-
-                <a href="{% url 'kanban' %}" class="pricing-btn">Comenzar Gratis</a>
+    <button
+        type="button"
+        class="pricing-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#pagoModal"
+        data-plan-codigo="basic"
+        data-plan-nombre="Focusa Básico"
+        data-plan-precio="0"
+    >
+        Comenzar Gratis
+    </button>
             </div>
 
             <!-- Plan Pro (Destacado) -->
@@ -125,16 +134,128 @@
                     </li>
                 </ul>
 
-                <a href="{% url 'kanban' %}" class="pricing-btn">Actualizar a Pro</a>
+    <button
+        type="button"
+        class="pricing-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#pagoModal"
+        data-plan-codigo="pro"
+        data-plan-nombre="Focusa Pro"
+        data-plan-precio="1900"
+    >
+        Actualizar a Pro
+    </button>
             </div>
         </div>
     </div>
 </section>
-</main>
+
+
+<!-- Modal de Pago / Selección de Plan -->
+<div class="modal fade" id="pagoModal" tabindex="-1" aria-labelledby="pagoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="{% url 'suscripcion' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="pagoModalLabel">Confirmar suscripción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Resumen del plan seleccionado -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Plan seleccionado</label>
+            <div>
+              <span id="resumen-plan-nombre" class="fw-bold">—</span>
+              <span id="resumen-plan-precio" class="text-muted ms-1"></span>
+            </div>
+          </div>
+
+          <!-- Select de plan (por si el usuario quiere cambiar dentro del modal) -->
+          <div class="mb-3">
+            <label for="planSelect" class="form-label">Cambiar plan (opcional)</label>
+            <select id="planSelect" name="plan_codigo" class="form-select" required>
+              {% for plan in planes %}
+                <option value="{{ plan.codigo }}">
+                  {{ plan.nombre }} — ${{ plan.precio_clp }} / mes
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Método de pago -->
+          <div class="mb-3">
+            <label for="metodoPagoSelect" class="form-label">Método de pago</label>
+            <select id="metodoPagoSelect" name="metodo_pago" class="form-select" required>
+              {% for mp in metodos_pago %}
+                <option value="{{ mp.codigo }}">{{ mp.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Checkbox de auto-renovación (cosmético por ahora) -->
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" value="1" id="autoRenovarCheck" checked disabled>
+            <label class="form-check-label" for="autoRenovarCheck">
+              Renovar automáticamente cada mes (simulado)
+            </label>
+          </div>
+
+          <p class="small text-muted mb-0">
+            Por ahora este pago es solo de prueba, no se realizará ningún cargo real.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Confirmar suscripción</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 
   <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const pagoModal = document.getElementById('pagoModal');
+    const planSelect = document.getElementById('planSelect');
+    const resumenNombre = document.getElementById('resumen-plan-nombre');
+    const resumenPrecio = document.getElementById('resumen-plan-precio');
+
+    // Cada botón de las cards tiene data-plan-*
+    const botonesPlan = document.querySelectorAll('[data-plan-codigo]');
+
+    botonesPlan.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const codigo = this.getAttribute('data-plan-codigo');
+        const nombre = this.getAttribute('data-plan-nombre');
+        const precio = this.getAttribute('data-plan-precio');
+
+        // Setear el select de plan
+        if (planSelect) {
+          planSelect.value = codigo;
+        }
+
+        // Actualizar resumen
+        if (resumenNombre) {
+          resumenNombre.textContent = nombre || 'Plan seleccionado';
+        }
+        if (resumenPrecio) {
+          if (precio && precio !== '0') {
+            resumenPrecio.textContent = `— $${precio} CLP / mes`;
+          } else {
+            resumenPrecio.textContent = `— Gratis`;
+          }
+        }
+      });
+    });
+  });
+</script>
+
   {% block extra_js %}{% endblock %}
 </body>
 </html>

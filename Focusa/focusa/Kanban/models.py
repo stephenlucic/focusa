@@ -16,6 +16,13 @@ def tarea_attachment_upload_path(instance, filename):
     return os.path.join("adjuntos", f"{instance.responsable_id}_{slug_name}", f"{timestamp}_{slug}{ext}")
 
 class Tag(models.Model):
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="kanban_tags",
+        null=True,
+        blank=True,  # para no romper los tags viejos globales
+    )
     nombre = models.CharField(max_length=50)
     color = models.CharField(max_length=7, default="#0d6efd")  # formato #RRGGBB
 

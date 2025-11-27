@@ -7,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
+from django.contrib import messages
+
 import os
 
 @login_required
@@ -18,8 +20,27 @@ def kanban(request):
         if action == "create_tag":
             nombre = request.POST.get("name", "").strip()
             color = request.POST.get("color", "#0d6efd").strip() or "#0d6efd"
+
+            #  Obtener plan
+            plan = None
+            try:
+                plan = request.user.perfil.plan_actual
+            except Exception:
+                plan = None
+
+            # validar límite de tags
+            if plan and plan.max_tags is not None:
+                total_tags = Tag.objects.filter(usuario=request.user).count()
+                if total_tags >= plan.max_tags:
+                    messages.error(
+                        request,
+                        f"Has alcanzado el límite de {plan.max_tags} tags de tu plan {plan.nombre}. "
+                        f"Actualiza tu suscripción para crear más tags."
+                    )
+                    return redirect("kanban")
+                
             if nombre:
-                Tag.objects.create(nombre=nombre, color=color)
+                Tag.objects.create(usuario=request.user, nombre=nombre, color=color)
             return redirect("kanban")
 
         # 2) Crear TAREA
@@ -31,10 +52,28 @@ def kanban(request):
         fecha_hasta = request.POST.get("end_date") or None
         tag_id = request.POST.get("tag") or None
 
+        #  Obtener plan del usuario (si tiene perfil/suscripción)
+        plan = None
+        try:
+            plan = request.user.perfil.plan_actual
+        except Exception:
+            plan = None
+
+        #  Si el plan tiene límite de tareas, validarlo
+        if plan and plan.max_tareas is not None:
+            total_tareas = Tarea.objects.filter(responsable=request.user).count()
+            if total_tareas >= plan.max_tareas:
+                messages.error(
+                    request,
+                    f"Has alcanzado el límite de {plan.max_tareas} tareas de tu plan {plan.nombre}. "
+                    f"Actualiza tu suscripción para crear más tareas."
+                )
+                return redirect("kanban")
+
         tag = None
         if tag_id:
             try:
-                tag = Tag.objects.get(id=tag_id)
+                tag = Tag.objects.get(id=tag_id, usuario=request.user)
             except Tag.DoesNotExist:
                 tag = None
 
@@ -56,7 +95,7 @@ def kanban(request):
         return redirect("kanban")
 
     tareas = Tarea.objects.filter(responsable=request.user).order_by("fecha_creacion")
-    tags = Tag.objects.all().order_by("nombre")
+    tags = Tag.objects.filter(usuario=request.user).order_by("nombre")
     contexto = {
         "tareas_todo": tareas.filter(estado="todo"),
         "tareas_progress": tareas.filter(estado="progress"),
@@ -105,7 +144,7 @@ def tarea_detalle_actualizar(request, pk):
         tag = None
         if tag_id:
             try:
-                tag = Tag.objects.get(id=tag_id)
+                tag = Tag.objects.get(id=tag_id, usuario=request.user)
             except Tag.DoesNotExist:
                 tag = None
 
@@ -162,14 +201,14 @@ def eliminar_tarea(request, pk):
 @require_POST
 @login_required
 def eliminar_tag(request, pk):
-    tag = get_object_or_404(Tag, pk=pk)
+    tag = get_object_or_404(Tag, pk=pk, usuario=request.user)
     tag.delete()
     return JsonResponse({"ok": True})
 
 @require_POST
 @login_required
 def actualizar_tag(request, pk):
-    tag = get_object_or_404(Tag, pk=pk)
+    tag = get_object_or_404(Tag, pk=pk, usuario=request.user)
     nombre = request.POST.get('nombre', '').strip()
     color = request.POST.get('color', '#0d6efd').strip() or '#0d6efd'
     if not nombre:
@@ -186,7 +225,25 @@ def crear_tag(request):
     color = request.POST.get("color","#0d6efd").strip() or "#0d6efd"
     if not nombre:
         return JsonResponse({"ok": False, "error": "Nombre requerido"}, status=400)
-    tag = Tag.objects.create(nombre=nombre, color=color)
+    
+    # obtener plan
+    plan = None
+    try:
+        plan = request.user.perfil.plan_actual
+    except Exception:
+        plan = None
+
+    # validar límite de tags (ej: 5 en plan Básico)
+    if plan and plan.max_tags is not None:
+        total_tags = Tag.objects.filter(usuario=request.user).count()
+        if total_tags >= plan.max_tags:
+            return JsonResponse({
+                "ok": False,
+                "error": f"Has alcanzado el límite de {plan.max_tags} tags de tu plan {plan.nombre}. "
+                         f"Actualiza tu suscripción para crear más tags."
+            }, status=400)
+        
+    tag = Tag.objects.create(usuario=request.user, nombre=nombre, color=color)
     return JsonResponse({"ok": True, "id": tag.id, "nombre": tag.nombre, "color": tag.color})
 
 @require_POST

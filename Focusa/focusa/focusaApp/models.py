@@ -4,7 +4,9 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
+from suscripcion.models import Suscripcion
 import os
+
 
 def avatar_upload_path(instance, filename):
     """
@@ -36,6 +38,28 @@ class Perfil(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.ocupacion or 'Sin ocupación'}"
+
+    @property
+    def suscripcion_activa(self):
+        now = timezone.now()
+        return (
+            Suscripcion.objects
+            .filter(
+                usuario=self.user,
+                estado__in=[Suscripcion.Estado.ACTIVA, Suscripcion.Estado.PRUEBA],
+            )
+            .filter(
+                models.Q(fecha_fin__isnull=True) |
+                models.Q(fecha_fin__gte=now)
+            )
+            .order_by("-fecha_inicio")
+            .first()
+        )
+
+    @property
+    def plan_actual(self):
+        sub = self.suscripcion_activa
+        return sub.plan if sub else None
 
 # crear perfil al crear user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

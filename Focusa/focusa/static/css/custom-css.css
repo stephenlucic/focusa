@@ -91,11 +91,23 @@
 
 /* Avatar a la derecha */
 .avatar{
-  width: 38px; height: 38px;
-  background: rgba(255,255,255,.95); color: #576092;
-  display: inline-flex; align-items: center; justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;      /* 🔥 hace el círculo */
+  overflow: hidden;        /* 🔥 recorta la imagen dentro */
+  background: rgba(255,255,255,.95);
+  color: #576092;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.1rem;
 }
+.avatar img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;       /* 🔥 adapta la foto sin deformar */
+}
+
 
 .main-content{
   margin-left: var(--sb-width-collapsed);  /* espacio inicial para sidebar colapsado */

@@ -8,6 +8,15 @@
 {% endblock %}
 
 {% block content %}  
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }} perfil-alert d-flex justify-content-between align-items-center px-3 py-2 mb-3">
+      <span>{{ m.message }}</span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
 <div class="container-fluid px-4 py-4">
   <!-- Header -->
   <div class="row mb-4">
@@ -35,9 +44,29 @@
         <div class="row align-items-center">
           <div class="col-md-7 mb-3 mb-md-0">
             <div class="config-option-label mb-2">
-              Plan actual: <span class="badge bg-secondary ms-1">Básico</span>
+              Plan actual:
+              {% if suscripcion_actual %}
+                <span class="badge bg-secondary ms-1">
+                  {{ suscripcion_actual.plan.nombre }}
+                </span>
+              {% else %}
+                <span class="badge bg-secondary ms-1">Sin plan</span>
+              {% endif %}
             </div>
-            <div class="config-option-help">Acceso a funcionalidades limitadas</div>
+            <div class="config-option-help">
+              {% if suscripcion_actual %}
+                {% if suscripcion_actual.estado == 'trialing' %}
+                  En período de prueba hasta {{ suscripcion_actual.fecha_fin|date:"d/m/Y" }}
+                {% elif suscripcion_actual.estado == 'active' %}
+                  Suscripción activa hasta {{ suscripcion_actual.fecha_fin|date:"d/m/Y" }}
+                  (renovación {{ suscripcion_actual.plan.periodo|yesno:"mensual,anual" }})
+                {% else %}
+                  Estado: {{ suscripcion_actual.get_estado_display }}
+                {% endif %}
+              {% else %}
+                Acceso limitado, elige un plan para desbloquear más funciones.
+              {% endif %}
+            </div>
           </div>
           <div class="col-md-5 text-md-end">
             <a href="{% url 'suscripcion' %}" class="btn btn-primary">

@@ -79,8 +79,12 @@
             {% endif %}
           </span>
           <!-- Avatar a la derecha -->
-          <span class="avatar rounded-circle d-inline-flex">
-            <i class="bi bi-person"></i>
+          <span class="avatar">
+              {% if user.is_authenticated and user.perfil.avatar %}
+                <img src="{{ user.perfil.avatar.url }}" alt="Avatar">
+              {% else %}
+                <i class="bi bi-person"></i>
+              {% endif %}
           </span>
         </button>
         <ul class="dropdown-menu dropdown-menu-end">

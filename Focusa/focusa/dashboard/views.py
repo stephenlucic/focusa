@@ -1,12 +1,27 @@
-import json
-from datetime import datetime, timedelta
-from calendar import month_abbr
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.db import connection
 from django.db.models import Count
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
+from datetime import datetime, timedelta
+from calendar import month_abbr
 from Kanban.models import Tarea  # ajusta import si el app label es distinto
+
+import json
+import pandas as pd
+
+def es_usuario_pro(user):
+    try:
+        plan = user.perfil.plan_actual  # o user.perfil.plan
+    except Exception:
+        return False
+
+    return plan and plan.codigo == "pro"
+
 
 def fetch_tareas_por_hacer(user_id):
     with connection.cursor() as cursor:
@@ -127,6 +142,21 @@ def contar_tareas_pendientes(user_id):
 def dashboard(request):
     user = request.user
 
+    # Plan actual del usuario (Focusa Básico/Pro)
+    plan = None
+    es_pro = False
+    try:
+        plan = user.perfil.plan_actual  # usamos la propiedad que ya tienes en Perfil
+        # Reglas sencillas:
+        # - Si el plan es None → se considera Básico/gratis
+        # - Si el código es 'pro' → Pro
+        if plan and getattr(plan, "codigo", "") == "pro":
+            es_pro = True
+    except Exception:
+        plan = None
+        es_pro = False
+
+
     # Tareas por hacer (SP)
     tareas_por_hacer = fetch_tareas_por_hacer(user.id)
     total_por_hacer = contar_tareas_por_hacer(user.id)
@@ -194,5 +224,160 @@ def dashboard(request):
         "tareas": tareas,
         "prioridades_labels_json": json.dumps(prioridades_labels),
         "prioridades_series_json": json.dumps(prioridades_series),
+        "plan": plan,
+        "es_pro": es_pro,
     }
     return render(request, "dashboard.html", ctx)
+
+
+
+@login_required
+def export_dashboard_excel(request):
+    if not es_usuario_pro(request.user):
+        messages.error(request, "La exportación a Excel está disponible solo en Focusa Pro.")
+        return redirect("dashboard")
+    
+    user = request.user
+
+    tareas_qs = (
+        Tarea.objects
+        .filter(responsable=user)
+        .order_by("-fecha_creacion")
+    )
+
+    # Mismo mapeo que usas en el dashboard
+    estado_map = {
+        "todo": "Por hacer",
+        "progress": "En proceso",
+        "review": "En revisión",
+        "done": "Completo",
+    }
+
+    porcentaje_map = {
+        "todo": 0,
+        "progress": 50,
+        "review": 80,
+        "done": 100,
+    }
+
+    filas = []
+    for t in tareas_qs:
+        # fechas sin timezone para que Excel no reclame
+        fecha_creacion = t.fecha_creacion.date() if t.fecha_creacion else None
+
+        fecha_inicio = getattr(t, "fecha_desde", None)
+        if fecha_inicio is not None and hasattr(fecha_inicio, "date"):
+            fecha_inicio = fecha_inicio.date()
+
+        fecha_fin = getattr(t, "fecha_hasta", None)
+        if fecha_fin is not None and hasattr(fecha_fin, "date"):
+            fecha_fin = fecha_fin.date()
+
+        filas.append({
+            "Título": t.titulo,
+            "Estado": estado_map.get(t.estado, t.estado),
+            "Prioridad": t.prioridad.capitalize(),  # o t.get_prioridad_display() si usas choices
+            "Fecha creación": fecha_creacion,
+            "Fecha inicio": fecha_inicio,
+            "Fecha fin": fecha_fin,
+            "% Avance": porcentaje_map.get(t.estado, 0),
+        })
+
+    df = pd.DataFrame(filas)
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="focusa_dashboard.xlsx"'
+
+    # 👇 volvemos a usar openpyxl, que ya tienes instalado
+    with pd.ExcelWriter(response, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="Tareas")
+
+    return response
+
+@login_required
+def export_dashboard_pdf(request):
+    if not es_usuario_pro(request.user):
+        messages.error(request, "La exportación a PDF está disponible solo en Focusa Pro.")
+        return redirect("dashboard")
+    try:
+        from weasyprint import HTML
+    except Exception:
+        messages.error(
+            request,
+            "La exportación a PDF no está disponible en este entorno."
+        )
+        return redirect("dashboard")
+
+    user = request.user
+    tareas_qs = (
+        Tarea.objects
+        .filter(responsable=user)
+        .order_by("-fecha_creacion")
+    )
+
+    estado_map = {
+        "todo": "Por hacer",
+        "progress": "En proceso",
+        "review": "En revisión",
+        "done": "Completado",
+    }
+    porcentaje_map = {
+        "todo": 0,
+        "progress": 50,
+        "review": 80,
+        "done": 100,
+    }
+
+    filas = []
+    for t in tareas_qs:
+        fc = t.fecha_creacion.date() if t.fecha_creacion else None
+
+        fi = getattr(t, "fecha_desde", None)
+        if fi is not None and hasattr(fi, "date"):
+            fi = fi.date()
+
+        ff = getattr(t, "fecha_hasta", None)
+        if ff is not None and hasattr(ff, "date"):
+            ff = ff.date()
+
+        filas.append({
+            "titulo": t.titulo,
+            "estado": estado_map.get(t.estado, t.estado),
+            "prioridad": t.prioridad.capitalize(),
+            "fecha_creacion": fc,
+            "fecha_inicio": fi,
+            "fecha_fin": ff,
+            "porcentaje": porcentaje_map.get(t.estado, 0),
+        })
+
+    total = len(filas)
+    tareas_completadas = sum(1 for f in filas if f["estado"] == "Completado")
+    tareas_por_hacer = sum(1 for f in filas if f["estado"] == "Por hacer")
+    tareas_pendientes = total - tareas_completadas
+    productividad_pct = round(
+        (tareas_completadas / total) * 100, 2
+    ) if total > 0 else 0
+
+    resumen = {
+        "tareas_pendientes": tareas_pendientes,
+        "tareas_por_hacer": tareas_por_hacer,
+        "tareas_completadas": tareas_completadas,
+        "productividad_pct": productividad_pct,
+    }
+
+    html_string = render_to_string("pdf/dashboard_export.html", {
+        "tareas": filas,
+        "resumen": resumen,
+    })
+
+    # 👇 base_url para que <img src="{% static ... %}"> funcione en WeasyPrint
+    pdf = HTML(
+        string=html_string,
+        base_url=request.build_absolute_uri("/")
+    ).write_pdf()
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename=\"focusa_dashboard.pdf\"'
+    return response

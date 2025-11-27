@@ -8,6 +8,16 @@
 {% endblock %}
 
 {% block content %}
+
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }} d-flex justify-content-between align-items-center px-3 py-2 mb-3">
+      <span>{{ m.message }}</span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="mb-0">Tablero Kanban</h2>
   <div class="d-flex gap-2">
@@ -459,6 +469,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const csrftoken = getCookie('csrftoken');
 
+    // === Loading global con SweetAlert2 ===
+    function showLoading(message = "Guardando...") {
+        Swal.fire({
+            title: message,
+            html: "<div class='mt-2'>Por favor espera</div>",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    }
+
+
     // --- drag & drop (sin cambios) ---
     function makeCardsDraggable() {
         const cards = document.querySelectorAll('.kanban-card');
@@ -687,6 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (saveBtn) {
         saveBtn.addEventListener('click', function() {
             if (saveBtn.disabled) return;
+            showLoading("Guardando cambios...");
             const taskId = document.getElementById('detailTaskId').value;
             if (!taskId) return;
             const formData = new FormData(formEl);
@@ -701,6 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(resp => resp.json())
             .then(data => {            // <-- corregido
                 if (!data.ok) {
+                    Swal.close();
                     document.getElementById('taskDetailError').textContent = data.error || 'Error al guardar los cambios.';
                     document.getElementById('taskDetailError').style.display = 'block';
                     return;
@@ -713,6 +740,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(err => {
                 console.error(err);
+                Swal.close();
                 document.getElementById('taskDetailError').textContent = 'Error de red al guardar.';
                 document.getElementById('taskDetailError').style.display = 'block';
             });
@@ -740,6 +768,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }).then((result) => {
             if (!result.isConfirmed) return;
 
+            showLoading("Eliminando tarea...");
+
             fetch(`{% url 'kanban_tarea_eliminar' 0 %}`.replace('/0/', `/${id}/`), {
                 method: 'POST',
                 headers: {
@@ -747,6 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             }).then(r => r.json()).then(data => {
+                Swal.close();
                 if (data.ok) {
                     card.remove();
                     updateTaskCounts(); // refresca mensaje vacío
@@ -764,6 +795,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
             }).catch(() => {
+                Swal.close();
                 Swal.fire({
                     icon: 'error',
                     title: 'Error de red',
@@ -789,6 +821,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cancelButtonColor: '#6c757d'
         }).then(r=>{
             if(!r.isConfirmed) return;
+            showLoading("Eliminando tag...");
             fetch(`{% url 'kanban_tag_eliminar' 0 %}`.replace('/0/', `/${id}/`), {
                 method: 'POST',
                 headers:{
@@ -796,6 +829,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-Requested-With':'XMLHttpRequest'
                 }
             }).then(resp=>resp.json()).then(data=>{
+                Swal.close();
                 if(data.ok){
                     // 1. quitar badge del modal
                     badge.remove();
@@ -809,7 +843,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     Swal.fire({icon:'error', title:'Error', text:data.error || 'No se pudo eliminar.'});
                 }
-            }).catch(()=> Swal.fire({icon:'error', title:'Error de red'}));
+            }).catch(()=>{Swal.close(); Swal.fire({icon:'error', title:'Error de red'});});
         });
     });
 
@@ -941,6 +975,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!name) return;
 
         if (mode === 'create') {
+            showLoading("Creando tag...");
             fetch(`{% url 'kanban_tag_crear' %}`, {
                 method: 'POST',
                 headers:{
@@ -950,6 +985,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: new URLSearchParams({ nombre:name, color:color })
             }).then(r=>r.json()).then(data=>{
+                Swal.close();
                 if(!data.ok){
                     Swal.fire({icon:'error', title:'Error', text:data.error || 'No se pudo crear.'});
                     return;
@@ -971,9 +1007,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 refreshTagAvailability();
                 Swal.fire({icon:'success', title:'Tag creado', timer:900, showConfirmButton:false});
                 exitTagEditMode();
-            }).catch(()=> Swal.fire({icon:'error', title:'Error de red'}));
+            }).catch(()=>{Swal.close(); Swal.fire({icon:'error', title:'Error de red'});});
         } else {
             const id = tagIdInput.value;
+            showLoading("Actualizando tag...");
             fetch(`{% url 'kanban_tag_actualizar' 0 %}`.replace('/0/', `/${id}/`), {
                 method:'POST',
                 headers:{
@@ -982,6 +1019,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: new URLSearchParams({ nombre:name, color:color })
             }).then(r=>r.json()).then(data=>{
+                Swal.close();
                 if(!data.ok){
                     Swal.fire({icon:'error', title:'Error', text:data.error || 'No se pudo actualizar.'});
                     return;
@@ -1001,7 +1039,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 Swal.fire({icon:'success', title:'Tag actualizado', timer:900, showConfirmButton:false});
                 exitTagEditMode();
-            }).catch(()=> Swal.fire({icon:'error', title:'Error de red'}));
+            }).catch(()=> {
+                Swal.close();
+                Swal.fire({icon:'error', title:'Error de red'})
+            });
         }
     });
 
@@ -1069,19 +1110,13 @@ document.addEventListener('DOMContentLoaded', function() {
             area.innerHTML = '<small class="text-muted">No hay adjunto.</small>';
         }
     }
-
-    /* En el fetch GET que rellena la modal (línea donde asignas t = data.tarea) añade:
-       renderAttachmentArea(data.tarea.attachment_url, data.tarea.attachment_name, taskId);
-    */
-
-    /* En el handler de guardar (POST) cuando recibas JSON de respuesta, si devuelve attachment puedes actualizar el área sin recargar:
-       if (data.ok) {
-         if (data.attachment) {
-            renderAttachmentArea(data.attachment.url, data.attachment.name, taskId);
-         }
-         location.reload(); // opcional si quieres refrescar todo
-       }
-    */
+    // === Loading al crear nueva tarea ===
+    const newTaskForm = document.getElementById("newTaskForm");
+    if (newTaskForm) {
+        newTaskForm.addEventListener("submit", function() {
+            showLoading("Creando tarea...");
+        });
+    }
 });
 </script>
 {% endblock %}
