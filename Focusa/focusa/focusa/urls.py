@@ -31,6 +31,7 @@ urlpatterns = [
     path('notificacion/', include('notificacion.urls')),
     path('configuracion/', include('configuracion.urls')),
     path('suscripcion/', include('suscripcion.urls')),
+    path('api/', include('apis.urls')),
 ]
 
 handler404 = "focusaApp.views.error_404"

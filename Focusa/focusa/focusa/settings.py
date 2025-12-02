@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'notificacion',
     'configuracion',
     'suscripcion',
+    'apis',
 ]
 
 MIDDLEWARE = [
