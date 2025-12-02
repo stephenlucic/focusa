@@ -3,9 +3,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User, Group
 from Kanban.models import Tarea, Tag
 from focusaApp.models import Perfil
+from django.conf import settings
 import json
 
-API_TOKEN = "blablax10"  # ideal: mover a settings
+API_TOKEN = settings.API_TOKEN 
 
 def check_token(request):
     auth = request.headers.get("Authorization", "")

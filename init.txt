@@ -1,0 +1,171 @@
+***** Crear entorno python 3.12 *****
+
+***** Levantar docker ****
+
+abrir la app de docker desktop
+ejecutar: docker compose up -d
+para bajar: docker compose down
+para borrar bd: docker compose down -v
+revisar conexión: docker ps -a
+
+
+***** Migrar base de datos *****
+
+ejecuta: python manage.py migrate (con el entorno activado)
+
+*****Crear estos procedimientos BBDD*****
+
+DROP PROCEDURE IF EXISTS sp_tareas_por_hacer;
+
+CREATE PROCEDURE sp_tareas_por_hacer(IN p_user_id INT)
+BEGIN
+  SELECT id, titulo, prioridad, estado, fecha_desde, fecha_hasta, fecha_creacion
+  FROM `Kanban_tarea`
+  WHERE responsable_id = p_user_id AND estado = 'todo'
+  ORDER BY fecha_creacion DESC;
+END
+
+
+DROP PROCEDURE IF EXISTS sp_contar_tareas_por_hacer;
+
+CREATE PROCEDURE sp_contar_tareas_por_hacer(IN p_user_id INT)
+BEGIN
+  SELECT COUNT(*) AS total_por_hacer
+  FROM `Kanban_tarea`
+  WHERE responsable_id = p_user_id AND estado = 'todo';
+END
+
+
+DROP PROCEDURE IF EXISTS sp_contar_tareas_pendientes;
+
+CREATE PROCEDURE sp_contar_tareas_pendientes(IN p_user_id INT)
+BEGIN
+  SELECT COUNT(*) AS total_pendientes
+  FROM `Kanban_tarea`
+  WHERE responsable_id = p_user_id AND estado != 'done';
+END
+
+***** OPCION 1 - Insertar los valores para el plan (con la shell)******
+
+python manage.py shell
+
+
+from suscripcion.models import Plan
+
+basic, _ = Plan.objects.get_or_create(
+    codigo="basic",
+    defaults={
+        "nombre": "Focusa Básico",
+        "descripcion": "Plan gratuito con funcionalidades esenciales.",
+        "precio_clp": 0,
+        "periodo": "monthly",
+        "dias_prueba": 0,
+        "es_activo": True,
+        "es_destacado": False,
+        "max_tareas": 50,
+        "max_tags": 5,
+    },
+)
+
+pro, _ = Plan.objects.get_or_create(
+    codigo="pro",
+    defaults={
+        "nombre": "Focusa Pro",
+        "descripcion": "Todas las funcionalidades, reportes avanzados y más.",
+        "precio_clp": 1990,
+        "periodo": "monthly",
+        "dias_prueba": 7,  # 👈 prueba de 7 días
+        "es_activo": True,
+        "es_destacado": True,
+        "max_tareas": None,  # ilimitado
+        "max_tags": None,
+    },
+)
+
+***** OPCION 2 - Insertar los valores para el plan (por sql)******
+
+-- BASIC: crear si no existe
+INSERT INTO suscripcion_plan (
+    codigo,
+    nombre,
+    descripcion,
+    precio_clp,
+    periodo,
+    dias_prueba,
+    es_activo,
+    es_destacado,
+    max_tareas,
+    max_tags,
+    creado_en,
+    actualizado_en
+)
+SELECT
+    'basic'                            AS codigo,
+    'Focusa Básico'                    AS nombre,
+    'Plan gratuito con funcionalidades esenciales.' AS descripcion,
+    0          AS precio_clp,
+    'monthly'  AS periodo,
+    0          AS dias_prueba,
+    TRUE       AS es_activo,
+    FALSE      AS es_destacado,
+    10         AS max_tareas,
+    5          AS max_tags,
+    NOW()      AS creado_en,
+    NOW()      AS actualizado_en
+FROM DUAL
+WHERE NOT EXISTS (
+    SELECT 1 FROM suscripcion_plan WHERE codigo = 'basic'
+);
+
+-- PRO: crear si no existe
+INSERT INTO suscripcion_plan (
+    codigo,
+    nombre,
+    descripcion,
+    precio_clp,
+    periodo,
+    dias_prueba,
+    es_activo,
+    es_destacado,
+    max_tareas,
+    max_tags,
+    creado_en,
+    actualizado_en
+)
+SELECT
+    'pro'                             AS codigo,
+    'Focusa Pro'                      AS nombre,
+    'Todas las funcionalidades, reportes avanzados y más.' AS descripcion,
+    1990       AS precio_clp,
+    'monthly'  AS periodo,
+    7          AS dias_prueba,
+    TRUE       AS es_activo,
+    TRUE       AS es_destacado,
+    NULL       AS max_tareas,
+    NULL       AS max_tags,
+    NOW()      AS creado_en,
+    NOW()      AS actualizado_en
+FROM DUAL
+WHERE NOT EXISTS (
+    SELECT 1 FROM suscripcion_plan WHERE codigo = 'pro'
+);
+
+**** Dependencias weasyPrint *****
+
+en windows --> instalar "gtk3-runtime-3.24.31-2022-01-04-ts-win64.exe" del siguiente link https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
+
+en mac --> brew install pango cairo gdk-pixbuf libffi glib
+
+**** Dependecias mysql *****
+
+en mac correr estos paquetes:
+brew install pkg-config mysql-client 
+export PKG_CONFIG_PATH="$(brew --prefix)/opt/mysql-client/lib/pkgconfig"
+
+en windows no es necesario hacer nada.
+
+
+**** poner claves en settings para correo y para apis *****
+
+API_TOKEN = "clave_de_api"
+EMAIL_HOST_PASSWORD = 'clave_de_aplicacion_correo'

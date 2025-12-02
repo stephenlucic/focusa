@@ -170,3 +170,5 @@ EMAIL_HOST_PASSWORD = 'yhalzezcirppvfhu'  # contraseña de aplicación, NO tu cl
 
 DEFAULT_FROM_EMAIL = 'Focusa <no-reply@focusa.cl>'  # o el correo que quieras mostrar
 SITE_URL = 'http://localhost:8000'  # para armar links en el correo
+
+API_TOKEN = "blablax10"
