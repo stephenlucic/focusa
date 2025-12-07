@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache  
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
 
 from .models import Notificacion
 
@@ -35,3 +37,18 @@ def notificaciones_count(request):
         leida=False
     ).count()
     return JsonResponse({'count': count})
+
+@require_POST
+@login_required
+def eliminar_notificacion(request, pk):
+    """Elimina una notificación específica del usuario"""
+    notificacion = get_object_or_404(Notificacion, pk=pk, usuario=request.user)
+    notificacion.delete()
+    return JsonResponse({'ok': True})
+
+@require_POST
+@login_required
+def eliminar_todas_notificaciones(request):
+    """Elimina todas las notificaciones del usuario"""
+    Notificacion.objects.filter(usuario=request.user).delete()
+    return JsonResponse({'ok': True})

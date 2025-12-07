@@ -6,7 +6,8 @@ from focusaApp.models import Perfil
 
 def admin_usuarios(request):
     usuarios = User.objects.all()
-    return render(request, "admin_usuarios.html", {"usuarios": usuarios})
+    grupos = Group.objects.all()
+    return render(request, "admin_usuarios.html", {"usuarios": usuarios, "grupos": grupos})
 
 def editar_usuario(request, user_id):
     usuario = get_object_or_404(User, id=user_id)
@@ -34,6 +35,19 @@ def eliminar_usuario(request, user_id):
         usuario = get_object_or_404(User, id=user_id)
         usuario.delete()
         return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def toggle_usuario_activo(request, user_id):
+    """Activa o desactiva un usuario"""
+    if request.method == 'POST':
+        usuario = get_object_or_404(User, id=user_id)
+        usuario.is_active = not usuario.is_active
+        usuario.save()
+        return JsonResponse({
+            'success': True, 
+            'is_active': usuario.is_active,
+            'user_id': usuario.id
+        })
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 def crear_usuario(request):
@@ -79,7 +93,3 @@ def crear_usuario(request):
         }})
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-def admin_usuarios(request):
-    usuarios = User.objects.all()
-    grupos = Group.objects.all()
-    return render(request, "admin_usuarios.html", {"usuarios": usuarios, "grupos": grupos})

@@ -93,8 +93,8 @@
 .avatar{
   width: 38px;
   height: 38px;
-  border-radius: 50%;      /* 🔥 hace el círculo */
-  overflow: hidden;        /* 🔥 recorta la imagen dentro */
+  border-radius: 50%;      /*  hace el círculo */
+  overflow: hidden;        /*  recorta la imagen dentro */
   background: rgba(255,255,255,.95);
   color: #576092;
   display: inline-flex;
@@ -105,7 +105,7 @@
 .avatar img{
   width: 100%;
   height: 100%;
-  object-fit: cover;       /* 🔥 adapta la foto sin deformar */
+  object-fit: cover;       /*  adapta la foto sin deformar */
 }
 
 

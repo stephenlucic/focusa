@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de Administración{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h2 class="mb-4">Dashboard de Administración</h2>
+
+  <!-- Tarjetas de métricas principales -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title text-muted">Total Usuarios</h5>
+          <p class="display-4 mb-0">{{ total_users }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title text-muted">Usuarios Activos</h5>
+          <p class="display-4 mb-0 text-success">{{ active_users }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title text-muted">Administradores</h5>
+          <p class="display-4 mb-0 text-primary">{{ admins_count }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title text-muted">Usuarios Normales</h5>
+          <p class="display-4 mb-0 text-info">{{ usuarios_count }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Día pico -->
+  {% if peak_day %}
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Día con más conexiones (últimos 30 días)</h5>
+          <p class="mb-1"><strong>Fecha:</strong> {{ peak_day.day }}</p>
+          <p class="mb-0"><strong>Conexiones:</strong> {{ peak_day.count }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Logins por día (últimos 7 días) -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Conexiones por día (últimos 7 días)</h5>
+          <div id="loginsChart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimas conexiones -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Últimas 10 conexiones</h5>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Fecha y Hora</th>
+                  <th>IP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in recent_logins %}
+                <tr>
+                  <td>{{ log.user.username }}</td>
+                  <td>{{ log.timestamp|date:"d/m/Y H:i" }}</td>
+                  <td>{{ log.ip_address|default:"N/A" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted">No hay registros</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const loginsData = {{ logins_per_day_json|safe }};
+  
+  console.log('Datos de logins:', loginsData); // Debug en consola
+
+  if (!loginsData || loginsData.length === 0) {
+    document.querySelector("#loginsChart").innerHTML = '<p class="text-muted text-center py-4">No hay datos para mostrar en los últimos 7 días</p>';
+    return;
+  }
+
+  const labels = loginsData.map(d => d.day);
+  const data = loginsData.map(d => d.count);
+
+  const options = {
+    chart: {
+      type: 'line',
+      height: 300,
+      toolbar: {
+        show: false
+      }
+    },
+    series: [{
+      name: 'Conexiones',
+      data: data
+    }],
+    xaxis: {
+      categories: labels,
+      title: {
+        text: 'Fecha'
+      }
+    },
+    yaxis: {
+      title: {
+        text: 'Número de conexiones'
+      },
+      min: 0
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2
+    },
+    colors: ['#4bc0c0'],
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.4,
+        opacityTo: 0.1,
+        stops: [0, 90, 100]
+      }
+    },
+    dataLabels: {
+      enabled: false
+    }
+  };
+
+  const chart = new ApexCharts(document.querySelector("#loginsChart"), options);
+  chart.render();
+});
+</script>
+{% endblock %}

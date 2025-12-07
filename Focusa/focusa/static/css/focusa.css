@@ -61,6 +61,7 @@ html, body {
 /* --- Botón Focusa Outline (Iniciar sesión) --- */
 .btn-outline-focusa2 {
   background: transparent;
+  display: inline-flex;
   color: #3B4178;               /* morado Focusa */
   border: 2px solid #3B4178;
   border-radius: 8px;
@@ -130,3 +131,34 @@ html, body {
 .footer h6 { color: #fff; }
 .footer a { color: #f8f9fa; text-decoration: none; }
 .footer a:hover { color: #fff; text-decoration: underline; }
+
+/* Ajustes responsive header home */
+@media (max-width: 991.98px) {
+  .header-center .header-menu {
+    gap: 0;
+  }
+  .header-center .nav-link {
+    padding: 0.5rem 0;
+  }
+}
+
+/* Pantallas tablet/desktop pequeño: reducir gap entre botones y font-size si hace falta */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .header-center .header-menu {
+    gap: 2rem;  /* menos espacio entre links para dar más sitio a los botones */
+  }
+  .btn-outline-focusa2,
+  .btn-focusa2 {
+    font-size: 0.8rem;
+    padding-inline: 0.75rem;
+  }
+}
+
+/* Móvil: botones apilados más pequeños */
+@media (max-width: 991.98px) {
+  .btn-outline-focusa2,
+  .btn-focusa2 {
+    font-size: 0.875rem;
+    padding-inline: 1rem;
+  }
+}

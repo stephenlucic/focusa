@@ -3,6 +3,25 @@
     <hr class="border-secondary my-0">
 
     <ul class="nav nav-pills flex-column p-3 gap-2">
+      {% if request.session.is_admin %}
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'dashboard_admin' %}active{% endif %}" href="{% url 'dashboard_admin' %} "
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Administrar usuarios">
+          <i class="bi bi-speedometer2"></i>
+          <span class="label">Dashboard Admin</span>
+        </a>
+      </li>
+      {% endif %}
+      {% if request.session.is_admin %}
+      <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'admin_usuarios' %}active{% endif %}" href="{% url 'admin_usuarios' %} "
+           data-bs-toggle="tooltip" data-bs-placement="right" title="Administrar usuarios">
+          <i class="bi bi-people"></i>
+          <span class="label">Administrar Usuarios</span>
+        </a>
+      </li>
+      {% endif %}
+      {% if request.session.is_usuario%}
       <li class="nav-item">
         <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'kanban' %}active{% endif %}" href="{% url 'kanban' %}"
            data-bs-toggle="tooltip" data-bs-placement="right" title="Kanban">
@@ -24,6 +43,7 @@
           <span class="label">Calendario</span>
         </a>
       </li>
+      {% endif %}
       <li class="nav-item">
         <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'configuracion' %}active{% endif %}" href="{% url 'configuracion' %}"
            data-bs-toggle="tooltip" data-bs-placement="right" title="Configuración">
@@ -38,15 +58,6 @@
           <span class="label">Perfil</span>
         </a>
       </li>
-      {% if request.session.is_admin %}
-      <li class="nav-item">
-        <a class="nav-link d-flex align-items-center gap-2 {% if request.resolver_match.url_name == 'admin_usuarios' %}active{% endif %}" href="{% url 'admin_usuarios' %} "
-           data-bs-toggle="tooltip" data-bs-placement="right" title="Administrar usuarios">
-          <i class="bi bi-people"></i>
-          <span class="label">Administrar Usuarios</span>
-        </a>
-      </li>
-      {% endif %}
     </ul>
 
 

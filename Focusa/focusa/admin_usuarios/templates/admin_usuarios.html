@@ -16,6 +16,7 @@
       <th>ID</th>
       <th>Usuario</th>
       <th>Email</th>
+      <th>Estado</th>
       <th>Grupos</th>
       <th>Acciones</th>
     </tr>
@@ -26,9 +27,17 @@
       <td>{{ usuario.id }}</td>
       <td>{{ usuario.username }}</td>
       <td>{{ usuario.email }}</td>
+      <td>
+        <span class="badge bg-{{ usuario.is_active|yesno:'success,secondary' }}" data-status="{{ usuario.is_active|yesno:'true,false' }}">
+          {{ usuario.is_active|yesno:'Activo,Inactivo' }}
+        </span>
+      </td>
       <td>{{ usuario.groups.all|join:", " }}</td>
       <td>
         <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" data-user-id="{{ usuario.id }}">Editar</button>
+        <button class="btn btn-sm btn-{{ usuario.is_active|yesno:'warning,success' }}" onclick="toggleActivo({{ usuario.id }})">
+          {{ usuario.is_active|yesno:'Desactivar,Activar' }}
+        </button>
         <button class="btn btn-sm btn-danger" onclick="eliminarUsuario({{ usuario.id }})">Eliminar</button>
       </td>
     </tr>
@@ -174,6 +183,46 @@
 
 {% block extra_js %}
 <script>
+function toggleActivo(userId) {
+  fetch(window.location.pathname + 'toggle-activo/' + userId + '/', {
+    method: 'POST',
+    headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      const row = document.querySelector(`[data-user-id="${userId}"]`);
+      const statusBadge = row.querySelector('[data-status]');
+      const toggleBtn = row.querySelector(`button[onclick="toggleActivo(${userId})"]`);
+      
+      if (data.is_active) {
+        statusBadge.className = 'badge bg-success';
+        statusBadge.textContent = 'Activo';
+        statusBadge.setAttribute('data-status', 'true');
+        toggleBtn.className = 'btn btn-sm btn-warning';
+        toggleBtn.textContent = 'Desactivar';
+      } else {
+        statusBadge.className = 'badge bg-secondary';
+        statusBadge.textContent = 'Inactivo';
+        statusBadge.setAttribute('data-status', 'false');
+        toggleBtn.className = 'btn btn-sm btn-success';
+        toggleBtn.textContent = 'Activar';
+      }
+      
+      Swal.fire({
+        title: data.is_active ? 'Usuario activado' : 'Usuario desactivado',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
+    }
+  })
+  .catch(e => {
+    console.error(e);
+    Swal.fire('Error', 'No se pudo cambiar el estado.', 'error');
+  });
+}
+
 function eliminarUsuario(userId) {
   Swal.fire({
     title: '¿Estás seguro?',
@@ -243,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = document.querySelector(`[data-user-id="${data.user.id}"]`);
         row.cells[1].textContent = data.user.username;
         row.cells[2].textContent = data.user.email;
-        row.cells[3].textContent = data.user.groups.join(', ');
+        row.cells[4].textContent = data.user.groups.join(', ');
         editModal.hide();
       }
     })
@@ -290,15 +339,24 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${data.user.id}</td>
           <td>${data.user.username}</td>
           <td>${data.user.email}</td>
+          <td>
+            <span class="badge bg-${data.user.is_active ? 'success' : 'secondary'}" data-status="${data.user.is_active}">
+              ${data.user.is_active ? 'Activo' : 'Inactivo'}
+            </span>
+          </td>
           <td>${data.user.groups.join(', ')}</td>
           <td>
             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" data-user-id="${data.user.id}">Editar</button>
+            <button class="btn btn-sm btn-${data.user.is_active ? 'warning' : 'success'}" onclick="toggleActivo(${data.user.id})">
+              ${data.user.is_active ? 'Desactivar' : 'Activar'}
+            </button>
             <button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${data.user.id})">Eliminar</button>
           </td>
         `;
         tbody.appendChild(row);
         createModal.hide();
         createForm.reset();
+        Swal.fire('Creado!', 'Usuario creado correctamente.', 'success');
       } else {
         Swal.fire('Error', data.error || 'No se pudo crear.', 'error');
       }

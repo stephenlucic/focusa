@@ -28,7 +28,7 @@ MESSAGE_TAGS = {
 }
 
 LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/kanban/' 
+LOGIN_REDIRECT_URL = '/focusa/redirect-after-login/'
 LOGOUT_REDIRECT_URL = '/'
 
 # Application definition
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'configuracion',
     'suscripcion',
     'apis',
+    'dashboard_admin'
 ]
 
 MIDDLEWARE = [
@@ -166,7 +167,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = 'notificacionesfocusa@gmail.com'
-EMAIL_HOST_PASSWORD = 'yhalzezcirppvfhu'  # contraseña de aplicación, NO tu clave normal
+EMAIL_HOST_PASSWORD = 'bazvhdapcqgvgubh'  # contraseña de aplicación, NO tu clave normal
 
 DEFAULT_FROM_EMAIL = 'Focusa <no-reply@focusa.cl>'  # o el correo que quieras mostrar
 SITE_URL = 'http://localhost:8000'  # para armar links en el correo

@@ -20,40 +20,45 @@
 
 </head>
 <body>
-  <!-- Header / Navbar -->
-  <header class="header-center border-bottom bg-white">
-    <!-- Nav horizontal con logo a la izquierda y menú a la derecha -->
-    <nav class="navbar navbar-expand-lg navbar-light py-3">
-      <div class="container">
-        <!-- Logo a la izquierda -->
-        <a href="/" class="navbar-brand">
-          <img src="{% static 'img/focusa_sin_fondo.png' %}" alt="Focusa" height="70">
-        </a>
+<header class="header-center border-bottom bg-white">
+  <nav class="navbar navbar-expand-lg navbar-light py-3">
+    <div class="container">
+      <!-- Logo -->
+      <a href="/" class="navbar-brand d-flex align-items-center">
+        <img src="{% static 'img/focusa_sin_fondo.png' %}" alt="Focusa" height="70">
+      </a>
 
-          <!-- Menú principal centrado -->
-          <ul class="navbar-nav mx-auto header-menu">
-            <li class="nav-item"><a class="nav-link" href="#home">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" href="#services">Servicios</a></li>
-            <li class="nav-item"><a class="nav-link" href="#beneficios">Beneficios</a></li>
-            <li class="nav-item"><a class="nav-link" href="#contact">Nosotros</a></li>
-          </ul>
+      <!-- Botón hamburguesa -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+              aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-<!-- Botones de autenticación a la derecha -->
+      <!-- Contenido colapsable -->
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <!-- Menú centrado en desktop, en columna en móvil -->
+        <ul class="navbar-nav mx-lg-auto ms-0 mt-3 mt-lg-0 header-menu text-center text-lg-start">
+          <li class="nav-item"><a class="nav-link" href="#home">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#beneficios">Beneficios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Nosotros</a></li>
+        </ul>
 
-        <div class="navbar-nav ms-auto">
-          <div class="d-flex gap-2 align-items-center">
-            <a href="{% url 'signup' %}" class="btn btn-focusa2 btn-sm px-3 d-flex align-items-center gap-2">
+        <!-- Botones a la derecha en desktop, centrados debajo del menú en móvil -->
+        <div class="d-flex flex-column flex-lg-row gap-2 align-items-center ms-lg-auto mt-3 mt-lg-0">
+          <a href="{% url 'signup' %}"
+             class="btn btn-focusa2 btn-sm px-3 d-flex align-items-center justify-content-center gap-2 w-100 w-lg-auto">
             Registrarse
-            </a>
-            <a href="{% url 'login' %}" class="btn btn-outline-focusa2 btn-sm px-3">
-            Iniciar sesión
-            </a>
-          </div>
-         </div>
+          </a>
+          <a href="{% url 'login' %}"
+             class="btn btn-outline-focusa2 btn-sm px-3 d-flex align-items-center justify-content-center w-100 w-lg-auto">
+            Iniciar&nbsp;sesión
+          </a>
         </div>
       </div>
-    </nav>
-  </header>
+    </div>
+  </nav>
+</header>
 
   <!-- Contenido -->
   <main id="home">

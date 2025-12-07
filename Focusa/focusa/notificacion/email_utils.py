@@ -2,9 +2,18 @@
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def enviar_correo_notificacion(notificacion):
+    """
+    Intenta enviar un correo de notificación.
+    Si falla (por config incorrecta, etc.), solo logea el error
+    sin interrumpir el flujo normal de la app.
+    """
     usuario = notificacion.usuario
 
     # Si el usuario no tiene email, no hacemos nada
@@ -44,10 +53,14 @@ def enviar_correo_notificacion(notificacion):
         "Equipo Focusa"
     )
 
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [usuario.email],
-        fail_silently=False,
-    )
+    try:
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [usuario.email],
+            fail_silently=True,  # no lanza excepción si falla
+        )
+    except Exception as e:
+        # Loguear el error pero no propagar la excepción
+        logger.warning(f"No se pudo enviar email a {usuario.email}: {e}")

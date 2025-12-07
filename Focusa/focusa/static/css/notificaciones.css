@@ -1,0 +1,25 @@
+/* Botón de eliminar notificación */
+.list-group-item {
+  position: relative;
+}
+
+.btn-delete-notif {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  padding: 0.15rem 0.25rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.btn-delete-notif:hover {
+  color: #dc3545;
+}
+
+.btn-delete-notif i {
+  font-size: 0.75rem;
+}

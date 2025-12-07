@@ -6,8 +6,11 @@ from django.contrib.auth import get_user_model
 from .models import Notificacion
 from Kanban.models import Tarea 
 from .email_utils import enviar_correo_notificacion 
+import logging
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
+
 
 
 def _obtener_destinatario(tarea: Tarea):
@@ -76,4 +79,8 @@ def enviar_correo_cuando_se_crea_notificacion(sender, instance, created, **kwarg
     if not created:
         return
 
-    enviar_correo_notificacion(instance)
+    try:
+        enviar_correo_notificacion(instance)
+    except Exception as e:
+        # Si falla el envío de email, solo loguear pero no interrumpir
+        logger.warning(f"Error al enviar correo de notificación: {e}")

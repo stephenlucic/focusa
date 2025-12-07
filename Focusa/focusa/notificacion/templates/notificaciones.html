@@ -4,6 +4,10 @@
 
 {% block title %}Focusa | Notificaciones{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/notificaciones.css' %}" />
+{% endblock %}
+
 {% block content %}
 <div class="container my-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
@@ -14,26 +18,46 @@
       </small>
     </div>
 
-    <form method="post" class="d-inline">
-      {% csrf_token %}
+    <div class="d-flex gap-2">
+      <form method="post" class="d-inline">
+        {% csrf_token %}
+        <button
+          type="submit"
+          class="btn btn-sm btn-outline-primary"
+          {% if not notificaciones %}disabled{% endif %}
+        >
+          <i class="bi bi-check-all"></i> Marcar todas como leídas
+        </button>
+      </form>
+
       <button
-        type="submit"
-        class="btn btn-sm btn-outline-primary"
-        {% if not notif_no_leidas_count %}disabled{% endif %}
+        type="button"
+        class="btn btn-sm btn-outline-danger"
+        onclick="eliminarTodas()"
+        {% if not notificaciones %}disabled{% endif %}
       >
-        Marcar todas como leídas
+        <i class="bi bi-trash"></i> Eliminar todas
       </button>
-    </form>
+    </div>
   </div>
 
   {% if notificaciones %}
     <div class="card shadow-sm">
       <div class="card-body p-0">
-        <ul class="list-group list-group-flush">
+        <ul class="list-group list-group-flush" id="notificacionesList">
           {% for n in notificaciones %}
-            <li class="list-group-item">
-              <div class="d-flex justify-content-between">
-                <div>
+            <li class="list-group-item" data-notif-id="{{ n.id }}">
+              <button 
+                type="button" 
+                class="btn-delete-notif"
+                onclick="eliminarNotificacion({{ n.id }})"
+                title="Eliminar notificación"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+              
+              <div class="d-flex justify-content-between align-items-start pe-4">
+                <div class="flex-grow-1">
                   <!-- badge por tipo de acción -->
                   {% if n.accion == 'creacion' %}
                     <span class="badge bg-success me-2">Creación</span>
@@ -55,7 +79,7 @@
                 <div class="text-end">
                   <!-- fecha en horario local -->
                   <div class="small text-muted">
-                    {{ n.creada_en|localtime }}
+                    {{ n.creada_en|localtime|date:"d/m/Y H:i" }}
                   </div>
                   <!-- tiempo relativo, opcional -->
                   <div class="small text-muted">
@@ -77,4 +101,112 @@
     </div>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function eliminarNotificacion(id) {
+  Swal.fire({
+    title: '¿Eliminar esta notificación?',
+    text: 'Esta acción no se puede deshacer',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/notificacion/eliminar/${id}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) {
+          const item = document.querySelector(`[data-notif-id="${id}"]`);
+          if (item) {
+            item.remove();
+            // Si no quedan notificaciones, mostrar mensaje
+            const list = document.getElementById('notificacionesList');
+            if (list && list.children.length === 0) {
+              location.reload();
+            }
+          }
+          Swal.fire({
+            title: 'Eliminada',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire('Error', 'No se pudo eliminar la notificación', 'error');
+      });
+    }
+  });
+}
+
+function eliminarTodas() {
+  Swal.fire({
+    title: '¿Eliminar todas las notificaciones?',
+    text: 'Se eliminarán todas tus notificaciones. Esta acción no se puede deshacer.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar todas',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch('/notificacion/eliminar-todas/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) {
+          Swal.fire({
+            title: 'Eliminadas',
+            text: 'Todas las notificaciones han sido eliminadas',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            location.reload();
+          });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        Swal.fire('Error', 'No se pudo eliminar las notificaciones', 'error');
+      });
+    }
+  });
+}
+</script>
 {% endblock %}

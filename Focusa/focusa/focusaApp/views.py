@@ -30,6 +30,23 @@ class SignUpView(CreateView):
         print("Signup errors:", form.errors.as_json())
         return super().form_invalid(form)
 
+def redirect_after_login(request):
+    """
+    Redirige al usuario según su grupo:
+    - Admin → /perfil/
+    - Usuario (o ambos) → /kanban/
+    """
+    user = request.user
+    is_admin = user.groups.filter(name='Administrador').exists()
+    is_usuario = user.groups.filter(name='Usuario').exists()
+
+    if is_admin and not is_usuario:
+        # Solo admin
+        return redirect('/admin-usuarios/')
+    else:
+        # Usuario o ambos → kanban
+        return redirect('/kanban/')
+    
 def error_404(request, exception):
     return render(request, "errors/404.html", status=404)
 
