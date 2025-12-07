@@ -3,13 +3,22 @@ from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.http import JsonResponse
 from focusaApp.models import Perfil
+from django.core.exceptions import PermissionDenied
 
 def admin_usuarios(request):
+    if not request.user.groups.filter(name='Administrador').exists():
+        messages.error(request, "No tienes permiso para acceder a esta página.")
+        raise PermissionDenied
+    
     usuarios = User.objects.all()
     grupos = Group.objects.all()
     return render(request, "admin_usuarios.html", {"usuarios": usuarios, "grupos": grupos})
 
 def editar_usuario(request, user_id):
+    if not request.user.groups.filter(name='Administrador').exists():
+        messages.error(request, "No tienes permiso para acceder a esta página.")
+        raise PermissionDenied
+    
     usuario = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         usuario.username = request.POST.get('username')
@@ -31,6 +40,10 @@ def editar_usuario(request, user_id):
     return JsonResponse({'id': usuario.id, 'username': usuario.username, 'email': usuario.email, 'grupos_html': grupos_html})
 
 def eliminar_usuario(request, user_id):
+    if not request.user.groups.filter(name='Administrador').exists():
+        messages.error(request, "No tienes permiso para acceder a esta página.")
+        raise PermissionDenied
+    
     if request.method == 'POST':
         usuario = get_object_or_404(User, id=user_id)
         usuario.delete()
@@ -38,6 +51,10 @@ def eliminar_usuario(request, user_id):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 def toggle_usuario_activo(request, user_id):
+    if not request.user.groups.filter(name='Administrador').exists():
+        messages.error(request, "No tienes permiso para acceder a esta página.")
+        raise PermissionDenied
+    
     """Activa o desactiva un usuario"""
     if request.method == 'POST':
         usuario = get_object_or_404(User, id=user_id)
@@ -51,6 +68,10 @@ def toggle_usuario_activo(request, user_id):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 def crear_usuario(request):
+    if not request.user.groups.filter(name='Administrador').exists():
+        messages.error(request, "No tienes permiso para acceder a esta página.")
+        raise PermissionDenied
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')

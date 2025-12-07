@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Reporte Dashboard Administración</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 15mm;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 10px;
+      color: #344055;
+      line-height: 1.4;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #343a80;
+      padding-bottom: 10px;
+    }
+
+    .logo {
+      width: 80px;
+      margin-bottom: 5px;
+    }
+
+    .titulo-principal {
+      font-size: 22px;
+      font-weight: 700;
+      color: #343a80;
+      margin: 5px 0;
+    }
+
+    .subtitulo {
+      font-size: 10px;
+      color: #666;
+      margin-top: 3px;
+    }
+
+    .meta-info {
+      text-align: right;
+      font-size: 9px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 14px;
+      color: #343a80;
+      margin: 15px 0 8px 0;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 4px;
+    }
+
+    h2::before {
+      content: "▪ ";
+      color: #343a80;
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .metricas-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .metrica-card {
+      border: 1px solid #e3e6f0;
+      border-radius: 6px;
+      padding: 8px;
+      background: #f9fafc;
+      text-align: center;
+    }
+
+    .metrica-label {
+      font-size: 8px;
+      color: #666;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .metrica-valor {
+      font-size: 20px;
+      font-weight: 700;
+      color: #343a80;
+    }
+
+    .metrica-valor.success {
+      color: #28a745;
+    }
+
+    .metrica-valor.warning {
+      color: #ffc107;
+    }
+
+    .metrica-valor.danger {
+      color: #dc3545;
+    }
+
+    .metrica-valor.info {
+      color: #17a2b8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 9px;
+    }
+
+    th, td {
+      border: 1px solid #dee2e6;
+      padding: 5px 6px;
+      text-align: left;
+    }
+
+    th {
+      background: #343a80;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 8px;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-muted {
+      color: #6c757d;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 8px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .badge-warning {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .badge-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .badge-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 3px solid #2196F3;
+      padding: 8px 10px;
+      margin: 10px 0;
+      font-size: 9px;
+    }
+
+    .info-box::before {
+      content: "► ";
+      color: #2196F3;
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      text-align: center;
+      font-size: 8px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    {% comment %} <img src="file://{{ STATIC_ROOT }}/img/focusa_sin_fondo.png" class="logo" alt="Focusa"> {% endcomment %}
+    <div style="font-size: 16px; font-weight: bold; color: #343a80; margin-bottom: 5px;">Focusa</div>
+    <h1 class="titulo-principal">Dashboard de Administración</h1>
+    <div class="subtitulo">Reporte completo de usuarios y actividad del sistema</div>
+  </div>
+
+  <div class="meta-info">
+    <strong>Generado por:</strong> {{ generado_por }} | 
+    <strong>Fecha:</strong> {{ fecha_generacion|date:"d/m/Y H:i" }}
+  </div>
+
+  <!-- Métricas principales -->
+  <h2>Métricas Generales</h2>
+  <div class="metricas-grid">
+    <div class="metrica-card">
+      <div class="metrica-label">Total Usuarios</div>
+      <div class="metrica-valor">{{ total_users }}</div>
+    </div>
+    <div class="metrica-card">
+      <div class="metrica-label">Activos</div>
+      <div class="metrica-valor success">{{ active_users }}</div>
+    </div>
+    <div class="metrica-card">
+      <div class="metrica-label">Inactivos</div>
+      <div class="metrica-valor">{{ inactive_users }}</div>
+    </div>
+    <div class="metrica-card">
+      <div class="metrica-label">Administradores</div>
+      <div class="metrica-valor info">{{ admins_count }}</div>
+    </div>
+    <div class="metrica-card">
+      <div class="metrica-label">Usuarios Normales</div>
+      <div class="metrica-valor info">{{ usuarios_count }}</div>
+    </div>
+    <div class="metrica-card">
+      <div class="metrica-label">Sin Login (30d)</div>
+      <div class="metrica-valor danger">{{ usuarios_inactivos_30 }}</div>
+    </div>
+  </div>
+
+  {% if peak_day %}
+  <div class="info-box">
+    <strong>Día pico (últimos 30 días):</strong> {{ peak_day.day }} con {{ peak_day.count }} conexiones
+  </div>
+  {% endif %}
+
+  <!-- Logins últimos 7 días -->
+  <h2>Conexiones últimos 7 días</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th class="text-center">Conexiones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for login in logins_per_day %}
+      <tr>
+        <td>{{ login.day }}</td>
+        <td class="text-center">{{ login.count }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="2" class="text-center text-muted">No hay datos de conexiones</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Tabla de usuarios -->
+  <h2>Actividad de Usuarios (Top 20)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Email</th>
+        <th>Grupo</th>
+        <th>Estado</th>
+        <th class="text-center">Total Logins</th>
+        <th>Última Conexión</th>
+        <th class="text-center">Días Inactivo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for info in usuarios_info %}
+      <tr>
+        <td>{{ info.user.username }}</td>
+        <td>{{ info.user.email }}</td>
+        <td>{{ info.grupos }}</td>
+        <td>
+          {% if info.user.is_active %}
+            <span class="badge badge-success">Activo</span>
+          {% else %}
+            <span class="badge badge-secondary">Inactivo</span>
+          {% endif %}
+        </td>
+        <td class="text-center">{{ info.total_logins }}</td>
+        <td>
+          {% if info.ultimo_login %}
+            {{ info.ultimo_login|date:"d/m/Y H:i" }}
+          {% else %}
+            <span class="text-muted">Nunca</span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {% if info.dias_inactivo is not None %}
+            {% if info.dias_inactivo < 7 %}
+              <span class="badge badge-success">{{ info.dias_inactivo }}</span>
+            {% elif info.dias_inactivo < 30 %}
+              <span class="badge badge-warning">{{ info.dias_inactivo }}</span>
+            {% else %}
+              <span class="badge badge-danger">{{ info.dias_inactivo }}</span>
+            {% endif %}
+          {% else %}
+            <span class="text-muted">N/A</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7" class="text-center text-muted">No hay usuarios registrados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="footer">
+    Focusa - Sistema de Gestión de Tareas | © 2025
+  </div>
+
+</body>
+</html>

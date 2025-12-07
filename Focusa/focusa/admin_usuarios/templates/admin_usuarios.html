@@ -9,7 +9,7 @@
 
 {% block content %}
 <h1>Administrar Usuarios</h1>
-<button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Crear Usuario</button>
+<button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Crear Usuario <i class="bi bi-person-add"></i></button>
 <table class="table" id="usuariosTable">
   <thead>
     <tr>
@@ -34,11 +34,11 @@
       </td>
       <td>{{ usuario.groups.all|join:", " }}</td>
       <td>
-        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" data-user-id="{{ usuario.id }}">Editar</button>
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" data-user-id="{{ usuario.id }}"><i class="bi bi-pencil-square"></i></button>
         <button class="btn btn-sm btn-{{ usuario.is_active|yesno:'warning,success' }}" onclick="toggleActivo({{ usuario.id }})">
-          {{ usuario.is_active|yesno:'Desactivar,Activar' }}
+          <i class="bi bi-person-fill-{{ usuario.is_active|yesno:'dash,check' }}"></i>
         </button>
-        <button class="btn btn-sm btn-danger" onclick="eliminarUsuario({{ usuario.id }})">Eliminar</button>
+        <button class="btn btn-sm btn-danger" onclick="eliminarUsuario({{ usuario.id }})"><i class="bi bi-person-fill-x"></i></button>
       </td>
     </tr>
     {% endfor %}
@@ -200,13 +200,13 @@ function toggleActivo(userId) {
         statusBadge.textContent = 'Activo';
         statusBadge.setAttribute('data-status', 'true');
         toggleBtn.className = 'btn btn-sm btn-warning';
-        toggleBtn.textContent = 'Desactivar';
+        toggleBtn.innerHTML = '<i class="bi bi-person-fill-dash"></i>';
       } else {
         statusBadge.className = 'badge bg-secondary';
         statusBadge.textContent = 'Inactivo';
         statusBadge.setAttribute('data-status', 'false');
         toggleBtn.className = 'btn btn-sm btn-success';
-        toggleBtn.textContent = 'Activar';
+        toggleBtn.innerHTML = '<i class="bi bi-person-fill-check"></i>';
       }
       
       Swal.fire({

@@ -3,9 +3,37 @@
 
 {% block title %}Panel de Administración{% endblock %}
 
+{% block extra_css %}
+<style>
+.table-usuarios {
+  font-size: 0.9rem;
+}
+.badge-inactivo {
+  background-color: #dc3545;
+}
+.badge-reciente {
+  background-color: #28a745;
+}
+.badge-moderado {
+  background-color: #ffc107;
+}
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
-  <h2 class="mb-4">Dashboard de Administración</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Dashboard de Administración</h2>
+    <a href="{% url 'exportar_dashboard_pdf' %}" class="btn btn-danger" target="_blank">
+      <i class="bi bi-file-earmark-pdf me-2"></i>Exportar PDF
+    </a>
+  </div>
 
   <!-- Tarjetas de métricas principales -->
   <div class="row g-3 mb-4">
@@ -68,6 +96,102 @@
         <div class="card-body">
           <h5 class="card-title">Conexiones por día (últimos 7 días)</h5>
           <div id="loginsChart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de usuarios con actividad -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Actividad de Usuarios</h5>
+            <div class="text-muted small">
+              <span class="badge badge-reciente">Activo (&lt;7 días)</span>
+              <span class="badge badge-moderado">Moderado (7-30 días)</span>
+              <span class="badge badge-inactivo">Inactivo (&gt;30 días)</span>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-usuarios table-hover">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Email</th>
+                  <th>Grupo</th>
+                  <th>Estado</th>
+                  <th>Total Logins</th>
+                  <th>Última Conexión</th>
+                  <th>Días Inactivo</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for info in usuarios_info %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      {% if info.user.perfil.foto_perfil %}
+                        <img src="{{ info.user.perfil.foto_perfil.url }}" class="user-avatar me-2" alt="{{ info.user.username }}">
+                      {% else %}
+                        <div class="user-avatar me-2 bg-secondary d-flex align-items-center justify-content-center text-white">
+                          {{ info.user.username|slice:":1"|upper }}
+                        </div>
+                      {% endif %}
+                      <span>{{ info.user.username }}</span>
+                    </div>
+                  </td>
+                  <td>{{ info.user.email }}</td>
+                  <td><span class="badge bg-secondary">{{ info.grupos }}</span></td>
+                  <td>
+                    {% if info.user.is_active %}
+                      <span class="badge bg-success">Activo</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Inactivo</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">{{ info.total_logins }}</td>
+                  <td>
+                    {% if info.ultimo_login %}
+                      {{ info.ultimo_login|date:"d/m/Y H:i" }}
+                    {% else %}
+                      <span class="text-muted">Nunca</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if info.dias_inactivo is not None %}
+                      {% if info.dias_inactivo < 7 %}
+                        <span class="badge badge-reciente">{{ info.dias_inactivo }} días</span>
+                      {% elif info.dias_inactivo < 30 %}
+                        <span class="badge badge-moderado">{{ info.dias_inactivo }} días</span>
+                      {% else %}
+                        <span class="badge badge-inactivo">{{ info.dias_inactivo }} días</span>
+                      {% endif %}
+                    {% else %}
+                      <span class="badge bg-secondary">N/A</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'admin_usuarios' %}" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    {% if info.dias_inactivo and info.dias_inactivo > 30 and info.user.is_active %}
+                      <button class="btn btn-sm btn-outline-warning" onclick="confirmarDesactivacion({{ info.user.id }}, '{{ info.user.username }}')" title="Usuario inactivo, considerar desactivar">
+                        <i class="bi bi-person-fill-dash"></i>
+                      </button>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="8" class="text-center text-muted">No hay usuarios registrados</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -172,5 +296,22 @@ document.addEventListener('DOMContentLoaded', function() {
   const chart = new ApexCharts(document.querySelector("#loginsChart"), options);
   chart.render();
 });
+
+function confirmarDesactivacion(userId, username) {
+  Swal.fire({
+    title: '¿Desactivar usuario?',
+    html: `El usuario <strong>${username}</strong> lleva más de 30 días sin conectarse.<br>¿Deseas desactivarlo?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#ffc107',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, desactivar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = `/admin-usuarios/toggle-activo/${userId}/`;
+    }
+  });
+}
 </script>
 {% endblock %}
