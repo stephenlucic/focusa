@@ -37,6 +37,7 @@
       const sidebar = document.getElementById('sidebarMenu');
       const toggle = document.getElementById('sidebarToggle');
       const mainContent = document.getElementById('content');
+      const isCalendarPage = () => window.location.pathname.startsWith('/calendario');
       if (!sidebar || !mainContent) return;
 
       const isDesktop = () => window.innerWidth >= 992;
@@ -61,8 +62,8 @@
         mainContent.style.marginLeft = 'var(--sb-width-collapsed)';
       }
 
-      sidebar.addEventListener('mouseenter', () => { clearTimeout(leaveTimer); expand(); });
-      sidebar.addEventListener('mouseleave', () => { clearTimeout(leaveTimer); leaveTimer = setTimeout(collapse, 200); });
+      sidebar.addEventListener('mouseenter', () => { clearTimeout(leaveTimer); if (!isCalendarPage()) {expand()}; });
+      sidebar.addEventListener('mouseleave', () => { clearTimeout(leaveTimer); if (!isCalendarPage()) leaveTimer = setTimeout(collapse, 200); });
       sidebar.addEventListener('focusin', expand);
       sidebar.addEventListener('focusout', () => { leaveTimer = setTimeout(collapse, 200); });
 

@@ -3,7 +3,6 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/calendario.css' %}">
-<link rel="stylesheet" href="{% static 'calendario/fullcalendar/index.css' %}">
 {% endblock %}
 
 {% block title %}Calendario | Focusa{% endblock %}
@@ -18,7 +17,7 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
-<script src="{% static 'calendario/fullcalendar/locales-all.global.min.js' %}"></script>
+<script src="{% static 'calendario/fullcalendar-6.1.19/locales-all.global.min.js' %}"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {

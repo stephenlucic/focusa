@@ -24,18 +24,17 @@
       
           <span
             id="notif-badge"
-            class="badge rounded-pill position-absolute top-0 start-100 translate-middle {% if not notif_no_leidas_count %}d-none{% endif %}"
+            class="badge rounded-pill {% if not notif_no_leidas_count %}d-none{% endif %}"
           >
             {{ notif_no_leidas_count|default:0 }}
           </span>
         </button>
       
-        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-notify" aria-labelledby="dropdownNotificaciones">
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-notify" aria-labelledby="dropdownNotificaciones" id="notificaciones-lista">
           {% if ultimas_notificaciones %}
             {% for n in ultimas_notificaciones %}
               <li>
-                <!-- Todas las opciones llevan a la página de notificaciones -->
-                <a class="dropdown-item small" href="{% url 'notificaciones' %}">
+                <a class="dropdown-item" href="{% url 'notificaciones' %}">
                   <div class="d-flex flex-column">
                     <span>
                       <strong>[{{ n.get_accion_display }}]</strong>
@@ -56,7 +55,7 @@
             </li>
           {% else %}
             <li>
-              <span class="dropdown-item small text-muted">
+              <span class="dropdown-item text-muted">
                 No tienes notificaciones nuevas
               </span>
             </li>
@@ -105,15 +104,52 @@
 </nav>
 
 <script>
-  function actualizarBadgeNotificaciones() {
+  function formatearTiempoTranscurrido(fechaStr) {
+    const fecha = new Date(fechaStr);
+    const ahora = new Date();
+    const diferencia = Math.floor((ahora - fecha) / 1000);
+
+    if (diferencia < 60) {
+      return `${diferencia} segundo${diferencia !== 1 ? 's' : ''}`;
+    } else if (diferencia < 3600) {
+      const minutos = Math.floor(diferencia / 60);
+      return `${minutos} minuto${minutos !== 1 ? 's' : ''}`;
+    } else if (diferencia < 86400) {
+      const horas = Math.floor(diferencia / 3600);
+      return `${horas} hora${horas !== 1 ? 's' : ''}`;
+    } else if (diferencia < 604800) {
+      const dias = Math.floor(diferencia / 86400);
+      return `${dias} día${dias !== 1 ? 's' : ''}`;
+    } else if (diferencia < 2592000) {
+      const semanas = Math.floor(diferencia / 604800);
+      return `${semanas} semana${semanas !== 1 ? 's' : ''}`;
+    } else if (diferencia < 31536000) {
+      const meses = Math.floor(diferencia / 2592000);
+      return `${meses} mes${meses !== 1 ? 'es' : ''}`;
+    } else {
+      const anos = Math.floor(diferencia / 31536000);
+      return `${anos} año${anos !== 1 ? 's' : ''}`;
+    }
+  }
+
+  function truncarTexto(texto, maxLength = 50) {
+    if (texto.length <= maxLength) return texto;
+    return texto.substring(0, maxLength) + '...';
+  }
+
+  function actualizarNotificaciones() {
     fetch("{% url 'notificaciones_count' %}")
       .then(response => response.json())
       .then(data => {
         const badge = document.getElementById('notif-badge');
-        if (!badge) return;
+        const lista = document.getElementById('notificaciones-lista');
+        
+        if (!badge || !lista) return;
 
         const count = data.count || 0;
+        const notificaciones = data.notificaciones || [];
 
+        // Actualizar badge
         if (count > 0) {
           badge.textContent = count;
           badge.classList.remove('d-none');
@@ -121,15 +157,64 @@
           badge.textContent = 0;
           badge.classList.add('d-none');
         }
+
+        // Actualizar lista de notificaciones
+        if (notificaciones.length > 0) {
+          let html = '';
+          
+          // Detectar si es móvil
+          const esMobil = window.innerWidth < 576;
+          const maxLengthTitulo = esMobil ? 35 : 50;
+          
+          notificaciones.forEach(notif => {
+            const tiempoTranscurrido = formatearTiempoTranscurrido(notif.creada_en);
+            const tituloTruncado = truncarTexto(notif.titulo, maxLengthTitulo);
+            
+            html += `
+              <li>
+                <a class="dropdown-item" href="{% url 'notificaciones' %}">
+                  <div class="d-flex flex-column">
+                    <span>
+                      <strong>[${notif.accion_display}]</strong>
+                      ${tituloTruncado}
+                    </span>
+                    <small class="text-muted">
+                      ${tiempoTranscurrido} atrás
+                    </small>
+                  </div>
+                </a>
+              </li>
+            `;
+          });
+
+          html += `
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item text-center fw-semibold" href="{% url 'notificaciones' %}">
+                Ver todas las notificaciones
+              </a>
+            </li>
+          `;
+
+          lista.innerHTML = html;
+        } else {
+          lista.innerHTML = `
+            <li>
+              <span class="dropdown-item text-muted">
+                No tienes notificaciones nuevas
+              </span>
+            </li>
+          `;
+        }
       })
       .catch(err => {
-        console.error("Error actualizando badge de notificaciones:", err);
+        console.error("Error actualizando notificaciones:", err);
       });
   }
 
-  // Opción 1: refrescar cada cierto tiempo (por ejemplo, cada 15s)
-  setInterval(actualizarBadgeNotificaciones, 3000);
+  // Actualizar cada 3 segundos
+  setInterval(actualizarNotificaciones, 3000);
 
-  // Opción 2 (recomendado): llamar una vez al cargar la página
-  document.addEventListener('DOMContentLoaded', actualizarBadgeNotificaciones);
+  // Actualizar al cargar la página
+  document.addEventListener('DOMContentLoaded', actualizarNotificaciones);
 </script>

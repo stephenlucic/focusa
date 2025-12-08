@@ -28,15 +28,36 @@ def notificaciones_vista(request):
         'notificaciones': notificaciones,
     })
 
+@login_required
 def notificaciones_count(request):
     """
-    Devuelve cuántas notificaciones no leídas tiene el usuario.
+    Endpoint JSON que devuelve el conteo de notificaciones no leídas
+    y la lista de las últimas notificaciones
     """
-    count = Notificacion.objects.filter(
+    no_leidas = Notificacion.objects.filter(
         usuario=request.user,
         leida=False
     ).count()
-    return JsonResponse({'count': count})
+    
+    # Obtener las últimas 5 notificaciones no leídas
+    ultimas = Notificacion.objects.filter(
+        usuario=request.user,
+        leida=False
+    ).order_by('-creada_en')[:5]
+    
+    notificaciones_data = []
+    for notif in ultimas:
+        notificaciones_data.append({
+            'id': notif.id,
+            'titulo': notif.titulo,
+            'accion_display': notif.get_accion_display(),
+            'creada_en': notif.creada_en.isoformat(),
+        })
+    
+    return JsonResponse({
+        'count': no_leidas,
+        'notificaciones': notificaciones_data
+    })
 
 @require_POST
 @login_required

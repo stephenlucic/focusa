@@ -1,8 +1,8 @@
 /* Wrapper */
 .calendar-wrapper {
   width: 100%;
-  padding: 1.5rem 2rem 2rem;
-  margin: 0;
+  padding: 1.5rem 1rem 2rem;
+  margin: 0 auto;
 }
 
 /* Contenedor calendario */
@@ -13,6 +13,7 @@
   padding:2rem 1.5rem;
   margin-bottom:2rem;
   width:100%;
+  min-height: 650px;  /* altura fija razonable */
 }
 
 /* Toolbar */
@@ -109,12 +110,6 @@
   color:#3B4178 !important;
 }
 
-/* Responsive */
-@media (max-width:768px){
-  #calendar { padding:1rem .6rem; border-radius:1rem; }
-  .fc-toolbar-title { font-size:1.3rem; }
-}
-
 /* Unir día y fecha en vista Lista y quitar subrayado */
 .fc-list-day-cushion {
   display:flex;
@@ -157,4 +152,51 @@
 #calendar .fc-list-day-cushion a:hover {
   text-decoration:none !important;
   color:#3B4178 !important;
+}
+
+@media (max-width: 768px){
+  #calendar { padding:1rem .6rem; border-radius:1rem; }
+  .fc-toolbar-title { font-size:1.3rem; }
+}
+
+/* Móvil pequeño */
+@media (max-width: 576px) {
+  .calendar-wrapper {
+    max-width: 420px;
+    width: 100%;
+    padding: 0.75rem 0.5rem 1.5rem;
+    margin: 0 auto;
+  }
+
+  #calendar {
+    padding: 1rem 0.75rem;
+    border-radius: 1rem;
+    /* NO tocamos min-height aquí */
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.1rem;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .fc-header-toolbar {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .fc-header-toolbar .fc-toolbar-chunk {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  .fc .fc-button {
+    padding: 0.25rem 0.7rem;
+    font-size: 0.8rem;
+    border-radius: 1.4rem !important;
+  }
 }

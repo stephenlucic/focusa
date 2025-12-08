@@ -15,9 +15,60 @@
     <link rel="stylesheet" href="{% static 'css/focusa.css' %}" />
     <link rel="stylesheet" href="{% static 'css/suscripcion.css' %}" />
 
+  <style>
+    .btn-close-page {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+      background: white;
+      border: 2px solid #dc3545;
+      color: #dc3545;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .btn-close-page:hover {
+      background: #dc3545;
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    .tarjeta-section {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    .tarjeta-section.show {
+      display: block;
+    }
+    
+    .card-type-indicator {
+      font-size: 12px;
+      color: #28a745;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+  </style>
+
   {% block extra_head %}{% endblock %}
 </head>
 <body>
+
+<!-- Botón X para cerrar -->
+<a href="{% url 'configuracion' %}" class="btn-close-page" title="Volver a configuración">
+  <i class="bi bi-x-lg"></i>
+</a>
 
 <!-- Sección de Planes -->
 <section class="pricing-section">
@@ -155,7 +206,7 @@
 <div class="modal fade" id="pagoModal" tabindex="-1" aria-labelledby="pagoModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form method="post" action="{% url 'suscripcion' %}">
+      <form method="post" action="{% url 'suscripcion' %}" id="pagoForm">
         {% csrf_token %}
         <div class="modal-header">
           <h5 class="modal-title" id="pagoModalLabel">Confirmar suscripción</h5>
@@ -177,7 +228,7 @@
             <label for="planSelect" class="form-label">Cambiar plan (opcional)</label>
             <select id="planSelect" name="plan_codigo" class="form-select" required>
               {% for plan in planes %}
-                <option value="{{ plan.codigo }}">
+                <option value="{{ plan.codigo }}" data-precio="{{ plan.precio_clp }}">
                   {{ plan.nombre }} — ${{ plan.precio_clp }} / mes
                 </option>
               {% endfor %}
@@ -194,11 +245,50 @@
             </select>
           </div>
 
+          <!-- Sección de datos de tarjeta (para crédito/débito) -->
+          <div id="tarjetaSection" class="tarjeta-section">
+            <h6 class="mb-3"><i class="bi bi-credit-card me-2"></i>Datos de la tarjeta</h6>
+            
+            <div class="mb-3">
+              <label for="numeroTarjeta" class="form-label">Número de tarjeta <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="numeroTarjeta" name="numero_tarjeta" 
+                     placeholder="1234 5678 9012 3456" maxlength="19">
+              <div id="cardTypeIndicator" class="card-type-indicator"></div>
+              <small class="text-muted">Ingrese el número de su tarjeta</small>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="fechaExpiracion" class="form-label">Fecha de expiración <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="fechaExpiracion" name="fecha_expiracion" 
+                       placeholder="MM/AA" maxlength="5">
+                <small class="text-muted">Ej: 12/25</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="cvv" class="form-label">CVV <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="cvv" name="cvv" 
+                       placeholder="123" maxlength="4">
+                <small class="text-muted">3-4 dígitos</small>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="nombreTitular" class="form-label">Nombre del titular <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="nombreTitular" name="nombre_titular" 
+                     placeholder="Como aparece en la tarjeta">
+            </div>
+
+            <div class="alert alert-info small mb-0">
+              <i class="bi bi-shield-check me-2"></i>
+              La informacion de su tarjeta está segura y protegida.
+            </div>
+          </div>
+
           <!-- Checkbox de auto-renovación (cosmético por ahora) -->
-          <div class="form-check mb-2">
+          <div class="form-check mb-2 mt-3">
             <input class="form-check-input" type="checkbox" value="1" id="autoRenovarCheck" checked disabled>
             <label class="form-check-label" for="autoRenovarCheck">
-              Renovar automáticamente cada mes (simulado)
+              Renovar automáticamente cada mes
             </label>
           </div>
 
@@ -209,7 +299,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Confirmar suscripción</button>
+          <button type="submit" class="btn btn-primary" id="btnConfirmar">Confirmar suscripción</button>
         </div>
       </form>
     </div>
@@ -219,12 +309,23 @@
 
   <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
   document.addEventListener('DOMContentLoaded', function () {
     const pagoModal = document.getElementById('pagoModal');
     const planSelect = document.getElementById('planSelect');
+    const metodoPagoSelect = document.getElementById('metodoPagoSelect');
     const resumenNombre = document.getElementById('resumen-plan-nombre');
     const resumenPrecio = document.getElementById('resumen-plan-precio');
+    const tarjetaSection = document.getElementById('tarjetaSection');
+    const pagoForm = document.getElementById('pagoForm');
+    const cardTypeIndicator = document.getElementById('cardTypeIndicator');
+
+    // Campos de tarjeta
+    const numeroTarjeta = document.getElementById('numeroTarjeta');
+    const fechaExpiracion = document.getElementById('fechaExpiracion');
+    const cvv = document.getElementById('cvv');
+    const nombreTitular = document.getElementById('nombreTitular');
 
     // Cada botón de las cards tiene data-plan-*
     const botonesPlan = document.querySelectorAll('[data-plan-codigo]');
@@ -251,7 +352,292 @@
             resumenPrecio.textContent = `— Gratis`;
           }
         }
+
+        // Mostrar/ocultar sección de tarjeta
+        verificarMostrarTarjeta();
       });
+    });
+
+    // Detectar cambio en plan o método de pago
+    if (planSelect) {
+      planSelect.addEventListener('change', verificarMostrarTarjeta);
+    }
+    if (metodoPagoSelect) {
+      metodoPagoSelect.addEventListener('change', verificarMostrarTarjeta);
+    }
+
+    function verificarMostrarTarjeta() {
+      const metodoPago = metodoPagoSelect.value;
+
+      // Mostrar tarjeta si método es crédito o débito (sin importar el plan)
+      const esTarjeta = metodoPago === 'credito' || metodoPago === 'debito';
+
+      if (esTarjeta) {
+        tarjetaSection.classList.add('show');
+        // Hacer campos obligatorios
+        numeroTarjeta.required = true;
+        fechaExpiracion.required = true;
+        cvv.required = true;
+        nombreTitular.required = true;
+      } else {
+        tarjetaSection.classList.remove('show');
+        // Quitar obligatoriedad
+        numeroTarjeta.required = false;
+        fechaExpiracion.required = false;
+        cvv.required = false;
+        nombreTitular.required = false;
+      }
+    }
+
+    // Detectar tipo de tarjeta
+    function detectarTipoTarjeta(numero) {
+      const numeroLimpio = numero.replace(/\s/g, '');
+      
+      // Patrones de tarjetas
+      const patrones = {
+        visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
+        mastercard: /^5[1-5][0-9]{14}$/,
+        amex: /^3[47][0-9]{13}$/,
+        discover: /^6(?:011|5[0-9]{2})[0-9]{12}$/,
+        diners: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/,
+        jcb: /^(?:2131|1800|35\d{3})\d{11}$/
+      };
+
+      for (const [tipo, patron] of Object.entries(patrones)) {
+        if (patron.test(numeroLimpio)) {
+          return tipo.charAt(0).toUpperCase() + tipo.slice(1);
+        }
+      }
+
+      // Verificar inicio para dar feedback temprano
+      if (numeroLimpio.startsWith('4')) return 'Visa...';
+      if (numeroLimpio.startsWith('5')) return 'Mastercard...';
+      if (numeroLimpio.startsWith('3')) return 'Amex/Diners...';
+      if (numeroLimpio.startsWith('6')) return 'Discover...';
+
+      return null;
+    }
+
+    // Algoritmo de Luhn para validar números de tarjeta
+    function validarLuhn(numero) {
+      const numeroLimpio = numero.replace(/\s/g, '');
+      
+      if (!/^\d+$/.test(numeroLimpio)) return false;
+      
+      let suma = 0;
+      let alternar = false;
+      
+      // Recorrer de derecha a izquierda
+      for (let i = numeroLimpio.length - 1; i >= 0; i--) {
+        let digito = parseInt(numeroLimpio.charAt(i), 10);
+        
+        if (alternar) {
+          digito *= 2;
+          if (digito > 9) {
+            digito -= 9;
+          }
+        }
+        
+        suma += digito;
+        alternar = !alternar;
+      }
+      
+      return (suma % 10) === 0;
+    }
+
+    // Formatear número de tarjeta (espacios cada 4 dígitos)
+    if (numeroTarjeta) {
+      numeroTarjeta.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+        e.target.value = formattedValue;
+
+        // Detectar y mostrar tipo de tarjeta
+        const tipo = detectarTipoTarjeta(value);
+        if (tipo && cardTypeIndicator) {
+          if (tipo.includes('...')) {
+            cardTypeIndicator.textContent = `Detectando: ${tipo}`;
+            cardTypeIndicator.style.color = '#6c757d';
+          } else {
+            cardTypeIndicator.textContent = `✓ ${tipo}`;
+            cardTypeIndicator.style.color = '#28a745';
+          }
+        } else if (value.length > 0) {
+          cardTypeIndicator.textContent = '⚠ Tipo de tarjeta no reconocido';
+          cardTypeIndicator.style.color = '#ffc107';
+        } else {
+          cardTypeIndicator.textContent = '';
+        }
+      });
+    }
+
+    // Formatear fecha de expiración (MM/AA)
+    if (fechaExpiracion) {
+      fechaExpiracion.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\//g, '').replace(/\D/g, '');
+        if (value.length >= 2) {
+          e.target.value = value.slice(0, 2) + '/' + value.slice(2, 4);
+        } else {
+          e.target.value = value;
+        }
+      });
+    }
+
+    // Solo números en CVV
+    if (cvv) {
+      cvv.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+      });
+    }
+
+    // Validación completa de tarjeta
+    function validarTarjeta(numero, fecha, cvvVal, nombre) {
+      const numeroLimpio = numero.replace(/\s/g, '');
+      
+      // Validar número con algoritmo de Luhn
+      if (!validarLuhn(numero)) {
+        return {
+          valido: false,
+          mensaje: 'Número de tarjeta inválido'
+        };
+      }
+
+      // Validar longitud según tipo
+      const tipo = detectarTipoTarjeta(numeroLimpio);
+      if (!tipo || tipo.includes('...')) {
+        return {
+          valido: false,
+          mensaje: 'Tipo de tarjeta no reconocido o número incompleto'
+        };
+      }
+
+      // Validar longitud específica
+      if (tipo === 'Amex' && numeroLimpio.length !== 15) {
+        return {
+          valido: false,
+          mensaje: 'Las tarjetas American Express deben tener 15 dígitos'
+        };
+      } else if (tipo !== 'Amex' && numeroLimpio.length !== 16) {
+        return {
+          valido: false,
+          mensaje: 'La tarjeta debe tener 16 dígitos'
+        };
+      }
+
+      // Validar formato de fecha
+      const fechaRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+      if (!fechaRegex.test(fecha)) {
+        return {
+          valido: false,
+          mensaje: 'Formato de fecha inválido. Use MM/AA'
+        };
+      }
+
+      // Validar que la fecha sea futura
+      const [mes, ano] = fecha.split('/');
+      const fechaActual = new Date();
+      const anoActual = fechaActual.getFullYear() % 100;
+      const mesActual = fechaActual.getMonth() + 1;
+      
+      if (parseInt(ano) < anoActual || (parseInt(ano) === anoActual && parseInt(mes) < mesActual)) {
+        return {
+          valido: false,
+          mensaje: 'La tarjeta ha expirado'
+        };
+      }
+
+      // Validar CVV
+      const cvvLength = tipo === 'Amex' ? 4 : 3;
+      if (cvvVal.length !== cvvLength) {
+        return {
+          valido: false,
+          mensaje: `CVV debe tener ${cvvLength} dígitos para ${tipo}`
+        };
+      }
+
+      // Validar nombre
+      if (!nombre || nombre.trim().length < 3) {
+        return {
+          valido: false,
+          mensaje: 'Ingrese un nombre de titular válido (mínimo 3 caracteres)'
+        };
+      }
+
+      return { valido: true, tipo };
+    }
+
+    // Validación del formulario
+    pagoForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const metodoPago = metodoPagoSelect.value;
+      const esTarjeta = metodoPago === 'credito' || metodoPago === 'debito';
+
+      if (esTarjeta) {
+        // Validar campos de tarjeta
+        if (!numeroTarjeta.value || !fechaExpiracion.value || !cvv.value || !nombreTitular.value) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Campos incompletos',
+            text: 'Por favor completa todos los datos de la tarjeta.',
+            confirmButtonColor: '#343a80'
+          });
+          return false;
+        }
+
+        // Validar tarjeta
+        const validacion = validarTarjeta(
+          numeroTarjeta.value,
+          fechaExpiracion.value,
+          cvv.value,
+          nombreTitular.value
+        );
+
+        if (!validacion.valido) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error en los datos',
+            text: validacion.mensaje,
+            confirmButtonColor: '#343a80'
+          });
+          return false;
+        }
+      }
+
+      // Simular procesamiento de pago
+      Swal.fire({
+        title: 'Procesando pago...',
+        html: 'Por favor espera mientras validamos tu información',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Simular delay de 2-3 segundos
+      setTimeout(function() {
+        Swal.close();
+        
+        // Mostrar éxito
+        Swal.fire({
+          icon: 'success',
+          title: '¡Pago exitoso!',
+          html: `Tu suscripción ha sido confirmada.<br><strong>${resumenNombre.textContent}</strong>`,
+          confirmButtonColor: '#28a745',
+          confirmButtonText: 'Continuar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Enviar el formulario real
+            pagoForm.submit();
+          }
+        });
+      }, 2500);
+    });
+
+    // Inicializar al cargar el modal
+    pagoModal.addEventListener('shown.bs.modal', function() {
+      verificarMostrarTarjeta();
     });
   });
 </script>

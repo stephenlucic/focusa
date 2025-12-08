@@ -24,7 +24,7 @@ class SignUpView(CreateView):
         usuario_group, _ = Group.objects.get_or_create(name="Usuario")
         user.groups.add(usuario_group)
         login(self.request, user)
-        return redirect(getattr(settings, "LOGIN_REDIRECT_URL", "/"))
+        return redirect('/suscripcion/')
 
     def form_invalid(self, form):
         print("Signup errors:", form.errors.as_json())
