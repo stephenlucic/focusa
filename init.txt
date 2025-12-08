@@ -169,3 +169,28 @@ en windows no es necesario hacer nada.
 
 API_TOKEN = "clave_de_api"
 EMAIL_HOST_PASSWORD = 'clave_de_aplicacion_correo'
+
+***** Insertar metodos de pago ****
+python manage.py shell
+
+from suscripcion.models import MetodoPago
+
+# Crear métodos de pago
+MetodoPago.objects.get_or_create(
+    codigo='credito',
+    defaults={'nombre': 'Tarjeta de Crédito', 'es_activo': True}
+)
+
+MetodoPago.objects.get_or_create(
+    codigo='debito',
+    defaults={'nombre': 'Tarjeta de Débito', 'es_activo': True}
+)
+
+MetodoPago.objects.get_or_create(
+    codigo='mock',
+    defaults={'nombre': 'Pago de prueba', 'es_activo': True}
+)
+
+print("Métodos de pago creados exitosamente!")
+print(MetodoPago.objects.all())
+exit()
