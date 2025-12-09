@@ -194,3 +194,12 @@ MetodoPago.objects.get_or_create(
 print("Métodos de pago creados exitosamente!")
 print(MetodoPago.objects.all())
 exit()
+
+
+**** en caso de que no se pueda eliminar usuarios por "notificacion_notificacion_usuario_id_6d853884_fk_auth_user_id" ****
+ALTER TABLE notificacion_notificacion 
+DROP FOREIGN KEY notificacion_notificacion_usuario_id_6d853884_fk_auth_user_id;
+
+ALTER TABLE notificacion_notificacion
+ADD CONSTRAINT notificacion_notificacion_usuario_id_6d853884_fk_auth_user_id
+FOREIGN KEY (usuario_id) REFERENCES auth_user(id) ON DELETE CASCADE;
